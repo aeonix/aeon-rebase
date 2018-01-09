@@ -377,7 +377,14 @@ namespace nodetool
       // full_addrs.insert("5.9.100.248:28080");
       // full_addrs.insert("163.172.182.165:28080");
       // full_addrs.insert("195.154.123.123:28080");
-      full_addrs.insert("52.191.198.51:21180"); //@devopsralf's server
+      
+      //@devopsralf's server
+      // full_addrs.insert("52.191.198.51:21180"); 
+      full_addrs.insert("d13.testnet.aeon.direct:21180");
+      
+      //@drparadox' server
+      // full_addrs.insert("45.32.165.18:21180");
+      full_addrs.insert("n1.testnet.aeon.direct:21180");
       full_addrs.insert("127.0.0.1:21180"); // Add VPS when ready
     }
     else
