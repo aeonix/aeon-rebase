@@ -220,12 +220,13 @@ TEST(ordering, Success)
   HardFork hf(db);
 
   ASSERT_TRUE(hf.add_fork(2, 2, 1));
-  ASSERT_FALSE(hf.add_fork(3, 3, 1));
-  ASSERT_FALSE(hf.add_fork(3, 2, 2));
-  ASSERT_FALSE(hf.add_fork(2, 3, 2));
-  ASSERT_TRUE(hf.add_fork(3, 10, 2));
-  ASSERT_TRUE(hf.add_fork(4, 20, 3));
-  ASSERT_FALSE(hf.add_fork(5, 5, 4));
+  ASSERT_FALSE(hf.add_fork(3, 3, 1));   // timestamp must increase
+  ASSERT_FALSE(hf.add_fork(3, 2, 2));   // height must increase
+  ASSERT_TRUE(hf.add_fork(2, 3, 2));    // specific to Aeon's first hardfork: the same version is allowed only for the first two entries
+  ASSERT_FALSE(hf.add_fork(2, 4, 3));   // version must increase
+  ASSERT_TRUE(hf.add_fork(3, 10, 4));
+  ASSERT_TRUE(hf.add_fork(4, 20, 5));
+  ASSERT_FALSE(hf.add_fork(5, 5, 6));
 }
 
 TEST(states, Success)

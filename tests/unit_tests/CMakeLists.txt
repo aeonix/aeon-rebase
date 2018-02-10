@@ -36,7 +36,7 @@ set(unit_tests_sources
   block_reward.cpp
   bulletproofs.cpp
   canonical_amounts.cpp
-  chacha8.cpp
+  chacha.cpp
   checkpoints.cpp
   command_line.cpp
   crypto.cpp
@@ -45,7 +45,7 @@ set(unit_tests_sources
   epee_boosted_tcp_server.cpp
   epee_levin_protocol_handler_async.cpp
   epee_utils.cpp
-  fee.cpp
+#  fee.cpp
   get_xtype_from_string.cpp
   hashchain.cpp
   http.cpp

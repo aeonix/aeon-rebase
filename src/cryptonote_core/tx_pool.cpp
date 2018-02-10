@@ -82,7 +82,7 @@ namespace cryptonote
 
     uint64_t get_transaction_size_limit(uint8_t version)
     {
-      return get_min_block_size(version) - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+      return get_min_block_size(version) * 125 / 100 - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
     }
 
     // This class is meant to create a batch when none currently exists.
@@ -290,7 +290,7 @@ namespace cryptonote
       }
       tvc.m_added_to_pool = true;
 
-      if(meta.fee > 0 && !do_not_relay)
+      if(meta.fee >= DEFAULT_FEE && !do_not_relay)
         tvc.m_should_be_relayed = true;
     }
 
@@ -969,7 +969,7 @@ namespace cryptonote
   }
   //---------------------------------------------------------------------------------
   //TODO: investigate whether boolean return is appropriate
-  bool tx_memory_pool::fill_block_template(block &bl, size_t median_size, uint64_t already_generated_coins, size_t &total_size, uint64_t &fee, uint64_t &expected_reward, uint8_t version)
+  bool tx_memory_pool::fill_block_template(block &bl, size_t median_size, uint64_t already_generated_coins, size_t &total_size, uint64_t &fee, uint64_t &expected_reward, uint8_t version, size_t height)
   {
     // Warning: This function takes already_generated_
     // coins as an argument and appears to do nothing
@@ -981,9 +981,10 @@ namespace cryptonote
     uint64_t best_coinbase = 0, coinbase = 0;
     total_size = 0;
     fee = 0;
+    size_t n = 0;
     
     //baseline empty block
-    get_block_reward(median_size, total_size, already_generated_coins, best_coinbase, version);
+    get_block_reward(median_size, total_size, already_generated_coins, best_coinbase, version, height);
 
 
     size_t max_total_size_pre_v5 = (130 * median_size) / 100 - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
@@ -1015,7 +1016,7 @@ namespace cryptonote
         // If we're getting lower coinbase tx,
         // stop including more tx
         uint64_t block_reward;
-        if(!get_block_reward(median_size, total_size + meta.blob_size, already_generated_coins, block_reward, version))
+        if(!get_block_reward(median_size, total_size + meta.blob_size, already_generated_coins, block_reward, version, height))
         {
           LOG_PRINT_L2("  would exceed maximum block size");
           sorted_it++;
@@ -1047,6 +1048,17 @@ namespace cryptonote
         MERROR("Failed to parse tx from txpool");
         sorted_it++;
         continue;
+      }
+
+      if (tx.vin.size() > 0)
+      {
+        CHECKED_GET_SPECIFIC_VARIANT(tx.vin[0], const txin_to_key, itk, false);
+        // discourage < 3-way-mix transactions by mining them only as the first tx in an empty block
+        if (n > 0 && itk.key_offsets.size() < 3)
+        {
+          sorted_it++;
+          continue;
+        }
       }
 
       // Skip transactions that are not ready to be
@@ -1085,6 +1097,7 @@ namespace cryptonote
       best_coinbase = coinbase;
       append_key_images(k_images, tx);
       sorted_it++;
+      n++;
       LOG_PRINT_L2("  added, new block size " << total_size << "/" << max_total_size << ", coinbase " << print_money(best_coinbase));
     }
 

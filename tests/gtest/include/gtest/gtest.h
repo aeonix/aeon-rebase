@@ -1958,6 +1958,12 @@ class TestWithParam : public Test, public WithParamInterface<T> {
 
 #if !GTEST_DONT_DEFINE_ASSERT_EQ
 # define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+# define ASSERT_EQ_MAP(val, map, key) \
+  do { \
+    auto found = map.find(key); \
+    ASSERT_TRUE(found != map.end()); \
+    GTEST_ASSERT_EQ(val, found->second); \
+  } while (false)
 #endif
 
 #if !GTEST_DONT_DEFINE_ASSERT_NE

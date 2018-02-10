@@ -77,7 +77,7 @@ bool HardFork::add_fork(uint8_t version, uint64_t height, uint8_t threshold, tim
   if (version == 0)
     return false;
   if (!heights.empty()) {
-    if (version <= heights.back().version)
+    if (version <= heights.back().version && !(heights.size() == 1 && version == heights.back().version))    // specific to Aeon's first hardfork: the same version is allowed only for the first two entries
       return false;
     if (height <= heights.back().height)
       return false;
