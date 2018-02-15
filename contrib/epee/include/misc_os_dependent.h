@@ -24,8 +24,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 #ifdef _WIN32
- #include <Winsock2.h>
- #endif
+#include <Winsock2.h>
+#endif
 
 #ifdef WIN32
   #ifndef WIN32_LEAN_AND_MEAN 
