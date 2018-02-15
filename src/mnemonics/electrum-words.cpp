@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -399,6 +399,10 @@ namespace crypto
       {
         language = Language::Singleton<Language::Lojban>::instance();
       }
+      else if (language_name == "EnglishOld")
+      {
+        language = Language::Singleton<Language::EnglishOld>::instance();
+      }
       else
       {
         return false;
@@ -433,7 +437,8 @@ namespace crypto
       }
 
       words.pop_back();
-      words += (' ' + words_store[create_checksum_index(words_store, language->get_unique_prefix_length())]);
+      //Checksum Word
+      //words += (' ' + words_store[create_checksum_index(words_store, language->get_unique_prefix_length())]);
       return true;
     }
 
@@ -452,6 +457,7 @@ namespace crypto
       std::vector<Language::Base*> language_instances({
         Language::Singleton<Language::German>::instance(),
         Language::Singleton<Language::English>::instance(),
+        Language::Singleton<Language::EnglishOld>::instance(),         
         Language::Singleton<Language::Spanish>::instance(),
         Language::Singleton<Language::French>::instance(),
         Language::Singleton<Language::Italian>::instance(),

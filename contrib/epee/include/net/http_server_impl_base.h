@@ -36,8 +36,8 @@
 #include "net/http_server_cp2.h"
 #include "net/http_server_handlers_map2.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.http"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "net.http"
 
 namespace epee
 {
@@ -55,13 +55,14 @@ namespace epee
         : m_net_server(external_io_service)
     {}
 
-    bool init(const std::string& bind_port = "0", const std::string& bind_ip = "0.0.0.0",
+    bool init(std::function<void(size_t, uint8_t*)> rng, const std::string& bind_port = "0", const std::string& bind_ip = "0.0.0.0",
       std::vector<std::string> access_control_origins = std::vector<std::string>(),
       boost::optional<net_utils::http::login> user = boost::none)
     {
 
       //set self as callback handler
       m_net_server.get_config_object().m_phandler = static_cast<t_child_class*>(this);
+      m_net_server.get_config_object().rng = std::move(rng);
 
       //here set folder for hosting reqests
       m_net_server.get_config_object().m_folder = "";

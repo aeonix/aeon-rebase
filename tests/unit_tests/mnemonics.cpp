@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -184,21 +184,17 @@ TEST(mnemonics, all_languages)
   }
 }
 
-TEST(mnemonics, language_detection_with_bad_checksum)
+TEST(mnemonics, language_detection)
 {
     crypto::secret_key key;
     std::string language_name;
     bool res;
 
     // This Portuguese (4-prefix) seed has all its words with 3-prefix that's also present in English
-    const std::string base_seed = "cinzento luxuriante leonardo gnostico digressao cupula fifa broxar iniquo louvor ovario dorsal ideologo besuntar decurso rosto susto lemure unheiro pagodeiro nitroglicerina eclusa mazurca bigorna";
-    const std::string real_checksum = "gnostico";
+    const std::string base_seed = "orquidea reavivar veemente higienizar misturar baqueta tibia midia inning deputado islandes ficticio toponimo injusto armisticio fevereiro gaviao muarra frutose vivo rixa taxionomista nexo obus";
 
     res = crypto::ElectrumWords::words_to_bytes(base_seed, key, language_name);
     ASSERT_EQ(true, res);
     ASSERT_STREQ(language_name.c_str(), "Português");
 
-    res = crypto::ElectrumWords::words_to_bytes(base_seed + " " + real_checksum, key, language_name);
-    ASSERT_EQ(true, res);
-    ASSERT_STREQ(language_name.c_str(), "Português");
 }

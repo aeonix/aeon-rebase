@@ -1,4 +1,4 @@
-// Copyright (c) 2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -39,16 +39,16 @@ static const struct
 } test_addresses[] =
 {
   {
-    "9uvjbU54ZJb8j7Dcq1h3F1DnBRkxXdYUX4pbJ7mE3ghM8uF3fKzqRKRNAKYZXcNLqMg7MxjVVD2wKC2PALUwEveGSC3YSWD",
-    "2dd6e34a234c3e8b5d29a371789e4601e96dee4ea6f7ef79224d1a2d91164c01"
+    "Wx46GqyjMRaSmPypmidMiWVnzeRWGqqTRTSuCj9yVpQy7UP2jh4bvHoPQBmVr33PVsZy2tezJjKTa1ifUpU3Tg6k1mtg9XLkS",
+    "bd04d12ef20582827fa467e2c57767db003f0d9a374f5e394105a2d2e4983507"
   },
   {
-    "9ywDBAyDbb6QKFiZxDJ4hHZqZEQXXCR5EaYNcndUpqPDeE7rEgs6neQdZnhcDrWbURYK8xUjhuG2mVjJdmknrZbcG7NnbaB",
-    "fac47aecc948ce9d3531aa042abb18235b1df632087c55a361b632ffdd6ede0c"
+    "Wx2nEcud8BoMQcTpWnjsuv522V9oitNtQGjFWJGMmTr97Mzng6ddtMs9bdeyXocr45HhNEwaKp6YQfq3recWqfgQ2MEZXPEvc",
+    "7d093811e030e77b6291d23f3611338cedacc47cdc460ef1e16dcf4b3ba15b0b"
   },
   {
-    "9t6Hn946u3eah5cuncH1hB5hGzsTUoevtf4SY7MHN5NgJZh2SFWsyVt3vUhuHyRKyrCQvr71Lfc1AevG3BXE11PQFoXDtD8",
-    "bbd3175ef9fd9f5eefdc43035f882f74ad14c4cf1799d8b6f9001bc197175d02"
+    "Wx2e7xxfDBFWTh9fPBUUJd2xyAyUtWZNQHogjavnom4wYbvoHMD9REqSJYsi54VHvXNTrb8ZBVnaMW9mGqViqdg21PErF67zc",
+    "841ede84aaa2ca4990406a82c45ea9b3af06949cd7bd472d9a870bfbef2ee70d"
   }
 };
 

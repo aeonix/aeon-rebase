@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -45,6 +45,7 @@ set(unit_tests_sources
   epee_boosted_tcp_server.cpp
   epee_levin_protocol_handler_async.cpp
   epee_utils.cpp
+  # TODO: ALL TEST CASES - fee.cpp
   fee.cpp
   get_xtype_from_string.cpp
   hashchain.cpp
@@ -64,6 +65,7 @@ set(unit_tests_sources
   test_protocol_pack.cpp
   hardfork.cpp
   unbound.cpp
+  # TODO: ALL TEST CASES - uri.cpp
   uri.cpp
   varint.cpp
   ringct.cpp

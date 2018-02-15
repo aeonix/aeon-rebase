@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -136,27 +136,30 @@ TEST(DNSResolver, IPv6Failure)
   ASSERT_EQ(0, ips.size());
 }
 
-TEST(DNSResolver, GetTXTRecord)
-{
-  bool avail, valid;
+// TODO: TEST CASE - comment back in the test below once decisions have been made, assuming
+// those decisions allow for the test itself to be relevant 
 
-  std::vector<std::string> records = tools::DNSResolver::instance().get_txt_record("donate.getmonero.org", avail, valid);
+// TEST(DNSResolver, GetTXTRecord)
+// {
+//   bool avail, valid;
 
-  EXPECT_NE(0, records.size());
+//   std::vector<std::string> records = tools::DNSResolver::instance().get_txt_record("donate.aeon.cash", avail, valid);
 
-  for (auto& rec : records)
-  {
-    std::cout << "TXT record for donate.getmonero.org: " << rec << std::endl;
-  }
+//   EXPECT_NE(0, records.size());
 
-  // replace first @ with .
-  std::string addr = tools::DNSResolver::instance().get_dns_format_from_oa_address("donate@getmonero.org");
-  EXPECT_STREQ("donate.getmonero.org", addr.c_str());
+//   for (auto& rec : records)
+//   {
+//     std::cout << "TXT record for donate.aeon.cash: " << rec << std::endl;
+//   }
 
-  // no change
-  addr = tools::DNSResolver::instance().get_dns_format_from_oa_address("donate.getmonero.org");
-  EXPECT_STREQ("donate.getmonero.org", addr.c_str());
-}
+//   // replace first @ with .
+//   std::string addr = tools::DNSResolver::instance().get_dns_format_from_oa_address("donate@aeon.cash");
+//   EXPECT_STREQ("donate.aeon.cash", addr.c_str());
+
+//   // no change
+//   addr = tools::DNSResolver::instance().get_dns_format_from_oa_address("donate.aeon.cash");
+//   EXPECT_STREQ("donate.aeon.cash", addr.c_str());
+// }
 
 TEST(DNS_PUBLIC, empty) { EXPECT_STREQ("", tools::dns_utils::parse_dns_public("").c_str()); }
 TEST(DNS_PUBLIC, default) { EXPECT_STREQ("8.8.4.4", tools::dns_utils::parse_dns_public("tcp").c_str()); }

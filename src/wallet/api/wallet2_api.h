@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -38,7 +38,7 @@
 #include <iostream>
 
 //  Public interface for libwallet library
-namespace Monero {
+namespace AEON {
 
     namespace Utils {
         bool isAddressLocal(const std::string &hostaddr);
@@ -764,7 +764,7 @@ struct WalletManager
     /*!
      * \brief  recovers existing wallet using memo (electrum seed)
      * \param  path           Name of wallet file to be created
-     * \param  memo           memo (25 words electrum seed)
+     * \param  memo           memo (24 words electrum seed)
      * \param  testnet        testnet
      * \param  restoreHeight  restore from start height
      * \return                Wallet instance (Wallet::status() needs to be called to check if recovered successfully)
@@ -857,7 +857,7 @@ struct WalletManager
     //! stops mining
     virtual bool stopMining() = 0;
 
-    //! resolves an OpenAlias address to a monero address
+    //! resolves an OpenAlias address to an AEON address
     virtual std::string resolveOpenAlias(const std::string &address, bool &dnssec_valid) const = 0;
 
     //! checks for an update and returns version, hash and url
@@ -887,5 +887,5 @@ struct WalletManagerFactory
 
 }
 
-namespace Bitmonero = Monero;
+
 

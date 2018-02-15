@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -271,7 +271,7 @@ namespace cryptonote
     {
       crypto::hash block_hash;
       uint64_t current_blockchain_height;      
-      std::vector<size_t> missing_tx_indices;
+      std::vector<uint64_t> missing_tx_indices;
       
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE_VAL_POD_AS_BLOB(block_hash)

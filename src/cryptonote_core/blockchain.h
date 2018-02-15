@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -194,6 +194,9 @@ namespace cryptonote
      * @return the hash of the block at the requested height, or a zeroed hash if there is no such block
      */
     crypto::hash get_block_id_by_height(uint64_t height) const;
+
+    /* Returns the testnet flag */
+    bool is_test_net() const;
 
     /**
      * @brief gets the block with a given hash

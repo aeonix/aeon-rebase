@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -39,8 +39,8 @@
 #include "cryptonote_config.h"
 #include "difficulty.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "difficulty"
 
 namespace cryptonote {
 
@@ -119,7 +119,10 @@ namespace cryptonote {
     return !carry;
   }
 
-  difficulty_type next_difficulty(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+  difficulty_type next_difficulty(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds, size_t height) {
+
+    if (height < HARDFORK_1_HEIGHT)
+      target_seconds = HARDFORK_1_OLD_TARGET;
 
     if(timestamps.size() > DIFFICULTY_WINDOW)
     {
@@ -159,7 +162,19 @@ namespace cryptonote {
     if (high != 0 || low + time_span - 1 < low) {
       return 0;
     }
-    return (low + time_span - 1) / time_span;
+
+    difficulty_type new_diff = (low + time_span - 1) / time_span;
+
+    if (height >= HARDFORK_1_HEIGHT && height < HARDFORK_1_HEIGHT+HARDFORK_1_DIFFADJ_WINDOW) {
+        new_diff += new_diff*(HARDFORK_1_HEIGHT+HARDFORK_1_DIFFADJ_WINDOW-height)*(HARDFORK_1_DIFFADJ-1)/HARDFORK_1_DIFFADJ_WINDOW;
+    }
+
+    return new_diff;
   }
 
 }
+
+
+
+
+

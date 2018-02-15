@@ -358,6 +358,8 @@ eof:
           if (!get_line_ret)
           {
             MERROR("Failed to read line.");
+            std::cin.clear();
+            continue;
           }
           string_tools::trim(command);
 

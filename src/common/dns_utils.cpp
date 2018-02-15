@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -39,8 +39,8 @@
 using namespace epee;
 namespace bf = boost::filesystem;
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.dns"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "net.dns"
 
 #define DEFAULT_DNS_PUBLIC_ADDR "8.8.4.4"
 
@@ -335,8 +335,8 @@ namespace dns_utils
 // TODO: parse the string in a less stupid way, probably with regex
 std::string address_from_txt_record(const std::string& s)
 {
-  // make sure the txt record has "oa1:xmr" and find it
-  auto pos = s.find("oa1:xmr");
+  // make sure the txt record has "oa1:aeon" and find it
+  auto pos = s.find("oa1:aeon");
   if (pos == std::string::npos)
     return {};
   // search from there to find "recipient_address="
@@ -348,10 +348,10 @@ std::string address_from_txt_record(const std::string& s)
   auto pos2 = s.find(";", pos);
   if (pos2 != std::string::npos)
   {
-    // length of address == 95, we can at least validate that much here
-    if (pos2 - pos == 95)
+    // length of address == 97, we can at least validate that much here
+    if (pos2 - pos == 97) //Aeon Addresses are 97 not 95
     {
-      return s.substr(pos, 95);
+      return s.substr(pos, 97);
     }
     else if (pos2 - pos == 106) // length of address == 106 --> integrated address
     {
@@ -361,18 +361,18 @@ std::string address_from_txt_record(const std::string& s)
   return {};
 }
 /**
- * @brief gets a monero address from the TXT record of a DNS entry
+ * @brief gets an AEON address from the TXT record of a DNS entry
  *
- * gets the monero address from the TXT record of the DNS entry associated
+ * gets the AEON address from the TXT record of the DNS entry associated
  * with <url>.  If this lookup fails, or the TXT record does not contain an
- * XMR address in the correct format, returns an empty string.  <dnssec_valid>
+ * AEON address in the correct format, returns an empty string.  <dnssec_valid>
  * will be set true or false according to whether or not the DNS query passes
  * DNSSEC validation.
  *
  * @param url the url to look up
  * @param dnssec_valid return-by-reference for DNSSEC status of query
  *
- * @return a monero address (as a string) or an empty string
+ * @return an AEON address (as a string) or an empty string
  */
 std::vector<std::string> addresses_from_url(const std::string& url, bool& dnssec_valid)
 {
@@ -389,7 +389,7 @@ std::vector<std::string> addresses_from_url(const std::string& url, bool& dnssec
   }
   else dnssec_valid = false;
 
-  // for each txt record, try to find a monero address in it.
+  // for each txt record, try to find an AEON address in it.
   for (auto& rec : records)
   {
     std::string addr = address_from_txt_record(rec);
@@ -496,7 +496,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 
   if (num_valid_records < 2)
   {
-    LOG_PRINT_L0("WARNING: no two valid MoneroPulse DNS checkpoint records were received");
+    LOG_PRINT_L0("WARNING: no two valid AeonPulse DNS checkpoint records were received");
     return false;
   }
 
@@ -518,7 +518,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 
   if (good_records_index < 0)
   {
-    LOG_PRINT_L0("WARNING: no two MoneroPulse DNS checkpoint records matched");
+    LOG_PRINT_L0("WARNING: no two AeonPulse DNS checkpoint records matched");
     return false;
   }
 

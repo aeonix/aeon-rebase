@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -673,7 +673,7 @@ TEST(Serialization, portability_wallet)
   const bool testnet = true;
   const bool restricted = false;
   tools::wallet2 w(testnet, restricted);
-  const boost::filesystem::path wallet_file = unit_test::data_dir / "wallet_9svHk1";
+  const boost::filesystem::path wallet_file = unit_test::data_dir / "wallet_aeon_9svHk1";
   string password = "test";
   bool r = false;
   try
@@ -701,12 +701,12 @@ TEST(Serialization, portability_wallet)
   */
   // blockchain
   ASSERT_TRUE(w.m_blockchain.size() == 1);
-  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_blockchain[0]) == "48ca7cd3c8de5b6a4d53d2861fbdaedca141553559f9be9520068053cda8430b");
+  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_blockchain[0]) == "Wx2s7zcpT1d8nHiroeD2LF3UtHbEyqFd4dExhNU5ivZ474mWX23fdhQEcsn6bVfnGgBqwcm4Fquu8gx8m17y3L4k1QbTMeZqT");
   // transfers (TODO)
   ASSERT_TRUE(w.m_transfers.size() == 3);
   // account public address
-  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_account_public_address.m_view_public_key) == "e47d4b6df6ab7339539148c2a03ad3e2f3434e5ab2046848e1f21369a3937cad");
-  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_account_public_address.m_spend_public_key) == "13daa2af00ad26a372d317195de0bdd716f7a05d33bc4d7aff1664b6ee93c060");
+  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_account_public_address.m_view_public_key) == "8f2f620651e7516b81a1e683ad9140d4bac0fc0bd6dfeed9532b7c2bf3152f61");
+  ASSERT_TRUE(epee::string_tools::pod_to_hex(w.m_account_public_address.m_spend_public_key) == "672f0e0c7a742e84c05c0a9610300ed4ddf332ed31c3d8ab40a6bbffcc7f2442");
   // key images
   ASSERT_TRUE(w.m_key_images.size() == 3);
   {
@@ -789,7 +789,7 @@ TEST(Serialization, portability_wallet)
   }
 }
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Monero output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "AEON output export\003"
 TEST(Serialization, portability_outputs)
 {
   // read file
@@ -905,10 +905,10 @@ TEST(Serialization, portability_outputs)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define UNSIGNED_TX_PREFIX "Monero unsigned tx set\003"
+#define UNSIGNED_TX_PREFIX "AEON unsigned tx set\003"
 TEST(Serialization, portability_unsigned_tx)
 {
-  const boost::filesystem::path filename = unit_test::data_dir / "unsigned_monero_tx";
+  const boost::filesystem::path filename = unit_test::data_dir / "unsigned_aeon_tx";
   std::string s;
   const bool testnet = true;
   bool r = epee::file_io_utils::load_file_to_string(filename.string(), s);
@@ -1053,10 +1053,10 @@ TEST(Serialization, portability_unsigned_tx)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define SIGNED_TX_PREFIX "Monero signed tx set\003"
+#define SIGNED_TX_PREFIX "AEON signed tx set\003"
 TEST(Serialization, portability_signed_tx)
 {
-  const boost::filesystem::path filename = unit_test::data_dir / "signed_monero_tx";
+  const boost::filesystem::path filename = unit_test::data_dir / "signed_aeon_tx";
   const bool testnet = true;
   std::string s;
   bool r = epee::file_io_utils::load_file_to_string(filename.string(), s);

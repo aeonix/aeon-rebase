@@ -1,4 +1,4 @@
-# Copyright (c) 2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -34,10 +34,10 @@ set(multisig_headers)
 set(multisig_private_headers
   multisig.h)
 
-monero_private_headers(multisig
+aeon_private_headers(multisig
   ${multisig_private_headers})
 
-monero_add_library(multisig
+aeon_add_library(multisig
   ${multisig_sources}
   ${multisig_headers}
   ${multisig_private_headers})

@@ -1,4 +1,4 @@
-// Copyright (c) 2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -30,7 +30,7 @@
 
 #include <stdint.h>
 #include "misc_log_ex.h"
-#include "common/memwipe.h"
+#include "memwipe.h"
 
 // Probably won't catch the optimized out case, but at least we test
 // it works in the normal case
@@ -47,7 +47,7 @@ static void test(bool wipe)
   if ((intptr_t)quux == foop)
   {
     MDEBUG(std::hex << std::setw(8) << std::setfill('0') << *(uint32_t*)quux);
-    if (wipe) ASSERT_TRUE(!memcmp(quux, "\0\0\0", 3));
+    if (wipe) ASSERT_TRUE(memcmp(quux, "\0\0\0", 3) != 0);
   }
   else MWARNING("We did not get the same location, cannot check");
   free(quux);
