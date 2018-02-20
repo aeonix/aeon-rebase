@@ -26,8 +26,8 @@
 
 #pragma once 
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.http"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "net.http"
 
 namespace epee
 {

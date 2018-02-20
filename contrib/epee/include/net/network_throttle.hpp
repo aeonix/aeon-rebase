@@ -2,7 +2,7 @@
 /// @author rfree (current maintainer in monero.cc project)
 /// @brief interface for throttling of connection (count and rate-limit speed etc)
 
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -99,8 +99,6 @@ struct calculate_times_struct {
 typedef calculate_times_struct calculate_times_struct;
 
 
-namespace cryptonote { class cryptonote_protocol_handler_base; } // a friend class // TODO friend not working
-
 /*** 
 @brief Access to simple throttles, with singlton to access global network limits
 */
@@ -117,11 +115,8 @@ class network_throttle_manager {
     static boost::mutex m_lock_get_global_throttle_inreq;
     static boost::mutex m_lock_get_global_throttle_out;
 
-		friend class cryptonote::cryptonote_protocol_handler_base; // FRIEND - to directly access global throttle-s. !! REMEMBER TO USE LOCKS!
 		friend class connection_basic; // FRIEND - to directly access global throttle-s. !! REMEMBER TO USE LOCKS!
 		friend class connection_basic_pimpl; // ditto
-
-		static int xxx;
 
 	public:
 		static i_network_throttle & get_global_throttle_in(); ///< singleton ; for friend class ; caller MUST use proper locks! like m_lock_get_global_throttle_in

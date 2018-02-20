@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -60,8 +60,8 @@
   #include "upnperrors.h"
 #endif
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.p2p"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "net.p2p"
 
 #define NET_MAKE_IP(b1,b2,b3,b4)  ((LPARAM)(((DWORD)(b1)<<24)+((DWORD)(b2)<<16)+((DWORD)(b3)<<8)+((DWORD)(b4))))
 
@@ -373,22 +373,15 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (testnet)
     {
-      full_addrs.insert("212.83.175.67:28080");
-      full_addrs.insert("5.9.100.248:28080");
-      full_addrs.insert("163.172.182.165:28080");
-      full_addrs.insert("195.154.123.123:28080");
-      full_addrs.insert("212.83.172.165:28080");
+      full_addrs.insert("d13.testnet.aeon.direct:21180");
+      full_addrs.insert("n1.testnet.aeon.direct:21180");
+      full_addrs.insert("127.0.0.1:21180"); 
     }
     else
     {
-      full_addrs.insert("107.152.130.98:18080");
-      full_addrs.insert("212.83.175.67:18080");
-      full_addrs.insert("5.9.100.248:18080");
-      full_addrs.insert("163.172.182.165:18080");
-      full_addrs.insert("161.67.132.39:18080");
-      full_addrs.insert("198.74.231.92:18080");
-      full_addrs.insert("195.154.123.123:28080");
-      full_addrs.insert("212.83.172.165:28080");
+        full_addrs.insert("74.91.23.186:11180");
+        full_addrs.insert("192.187.114.114:11180");
+      //full_addrs.insert("127.0.0.1:11180"); // Add VPS when ready
     }
     return full_addrs;
   }
@@ -1369,7 +1362,7 @@ namespace nodetool
     }
     rsp.connections_count = m_net_server.get_config_object().get_connections_count();
     rsp.incoming_connections_count = rsp.connections_count - get_outgoing_connections_count();
-    rsp.version = MONERO_VERSION_FULL;
+    rsp.version = AEON_VERSION_FULL;
     rsp.os_version = tools::get_os_version_string();
     m_payload_handler.get_stat_info(rsp.payload_info);
     return 1;
@@ -1994,4 +1987,4 @@ namespace nodetool
       MINFO("No IGD was found.");
     }
   }
-}
+}            

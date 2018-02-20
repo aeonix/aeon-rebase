@@ -41,8 +41,8 @@
 #include <random>
 #include <chrono>
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "net"
 
 #ifndef MIN_BYTES_WANTED
 #define MIN_BYTES_WANTED	512
@@ -99,6 +99,7 @@ public:
 
   async_protocol_handler_config():m_pcommands_handler(NULL), m_pcommands_handler_destroy(NULL), m_max_packet_size(LEVIN_DEFAULT_MAX_PACKET_SIZE)
   {}
+  ~async_protocol_handler_config() { set_handler(NULL, NULL); }
   void del_out_connections(size_t count);
 };
 
@@ -380,10 +381,14 @@ public:
           is_continue = false;
           if(cb >= MIN_BYTES_WANTED && !m_invoke_response_handlers.empty())
           {
-            //async call scenario
-            boost::shared_ptr<invoke_response_handler_base> response_handler = m_invoke_response_handlers.front();
-            response_handler->reset_timer();
-            MDEBUG(m_connection_context << "LEVIN_PACKET partial msg received. len=" << cb);
+            CRITICAL_REGION_LOCAL(m_invoke_response_handlers_lock);
+            if (!m_invoke_response_handlers.empty())
+            {
+              //async call scenario
+              boost::shared_ptr<invoke_response_handler_base> response_handler = m_invoke_response_handlers.front();
+              response_handler->reset_timer();
+              MDEBUG(m_connection_context << "LEVIN_PACKET partial msg received. len=" << cb);
+            }
           }
           break;
         }

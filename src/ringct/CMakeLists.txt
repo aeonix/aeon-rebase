@@ -1,4 +1,4 @@
-# Copyright (c) 2016, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -41,9 +41,9 @@ set(ringct_private_headers
   rctTypes.h
   bulletproofs.h)
 
-monero_private_headers(ringct
+aeon_private_headers(ringct
   ${crypto_private_headers})
-monero_add_library(ringct
+aeon_add_library(ringct
   ${ringct_sources}
   ${ringct_headers}
   ${ringct_private_headers})

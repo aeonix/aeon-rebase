@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -56,8 +56,8 @@
 #include "blocks/blocks.h"
 #endif
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "blockchain"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "blockchain"
 
 #define FIND_BLOCKCHAIN_SUPPLEMENT_MAX_SIZE (100*1024*1024) // 100 MB
 
@@ -89,25 +89,18 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  // version 1 from the start of the blockchain
-  { 1, 1, 0, 1341378000 },
+ // OYE! Pay attention here:
+ // Forks are entered like this { Version, Height, Threshold, EpochTime}
 
-  // version 2 starts from block 1009827, which is on or around the 20th of March, 2016. Fork time finalised on 2015-09-20. No fork voting occurs for the v2 fork.
-  { 2, 1009827, 0, 1442763710 },
-
-  // version 3 starts from block 1141317, which is on or around the 24th of September, 2016. Fork time finalised on 2016-03-21.
-  { 3, 1141317, 0, 1458558528 },
-  
-  // version 4 starts from block 1220516, which is on or around the 5th of January, 2017. Fork time finalised on 2016-09-18.
-  { 4, 1220516, 0, 1483574400 },
-  
-  // version 5 starts from block 1288616, which is on or around the 15th of April, 2017. Fork time finalised on 2017-03-14.
-  { 5, 1288616, 0, 1489520158 },  
-
-  // version 6 starts from block 1400000, which is on or around the 16th of September, 2017. Fork time finalised on 2017-08-18.
-  { 6, 1400000, 0, 1503046577 },
+  //Start of Aeon - V0
+  //{ 0, 1, 0, 1341378000 },
+  // version 1 hard fork of AEON was at 592000 2015-08-04 14:45:24
+  // at that time Target diff gets changes from 60 to 240
+  // and speed changes from 20 to 18
+  { 1, HARDFORK_1_HEIGHT, 0, 1438699524 }
 };
-static const uint64_t mainnet_hard_fork_version_1_till = 1009826;
+
+static const uint64_t mainnet_hard_fork_version_1_till = HARDFORK_1_HEIGHT - 1;
 
 static const struct {
   uint8_t version;
@@ -115,21 +108,13 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } testnet_hard_forks[] = {
-  // version 1 from the start of the blockchain
-  { 1, 1, 0, 1341378000 },
-
-  // version 2 starts from block 624634, which is on or around the 23rd of November, 2015. Fork time finalised on 2015-11-20. No fork voting occurs for the v2 fork.
-  { 2, 624634, 0, 1445355000 },
-
-  // versions 3-5 were passed in rapid succession from September 18th, 2016
-  { 3, 800500, 0, 1472415034 },
-  { 4, 801219, 0, 1472415035 },
-  { 5, 802660, 0, 1472415036 + 86400*180 }, // add 5 months on testnet to shut the update warning up since there's a large gap to v6
-
-  { 6, 971400, 0, 1501709789 },
-  { 7, 1057028, 0, 1512211236 },
+  // version 1 of the testnet starting from scratch until such time
+  // that we go public with a testnet and determine if hard forking
+  // from the top of the AEON mainnet blockchain is preferable 
+  // { 1, 1, 0, 0 },
 };
-static const uint64_t testnet_hard_fork_version_1_till = 624633;
+
+static const uint64_t testnet_hard_fork_version_1_till = ((uint64_t)(-1));
 
 //------------------------------------------------------------------
 Blockchain::Blockchain(tx_memory_pool& tx_pool) :
@@ -367,11 +352,11 @@ bool Blockchain::init(BlockchainDB* db, const bool testnet, bool offline, const 
     block_verification_context bvc = boost::value_initialized<block_verification_context>();
     if (m_testnet)
     {
-      generate_genesis_block(bl, config::testnet::GENESIS_TX, config::testnet::GENESIS_NONCE);
+      generate_genesis_block(bl, config::testnet::GENESIS_TX, config::testnet::GENESIS_NONCE, m_testnet);
     }
     else
     {
-      generate_genesis_block(bl, config::GENESIS_TX, config::GENESIS_NONCE);
+      generate_genesis_block(bl, config::GENESIS_TX, config::GENESIS_NONCE, m_testnet);
     }
     add_new_block(bl, bvc);
     CHECK_AND_ASSERT_MES(!bvc.m_verifivation_failed, false, "Failed to add genesis block to blockchain");
@@ -645,6 +630,12 @@ bool Blockchain::get_short_chain_history(std::list<crypto::hash>& ids) const
 
   return true;
 }
+
+bool Blockchain::is_test_net() const
+{ 
+  return m_testnet;
+}
+
 //------------------------------------------------------------------
 crypto::hash Blockchain::get_block_id_by_height(uint64_t height) const
 {
@@ -781,7 +772,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_difficulties = difficulties;
   }
   size_t target = get_difficulty_target();
-  return next_difficulty(timestamps, difficulties, target);
+  return next_difficulty(timestamps, difficulties, target, height);
 }
 //------------------------------------------------------------------
 // This function removes blocks from the blockchain until it gets to the
@@ -980,11 +971,10 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
     }
   }
 
-  // FIXME: This will fail if fork activation heights are subject to voting
-  size_t target = get_ideal_hard_fork_version(bei.height) < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
+  size_t target = bei.height < HARDFORK_1_HEIGHT ? HARDFORK_1_OLD_TARGET : DIFFICULTY_TARGET;
 
   // calculate the difficulty target for the block and return it
-  return next_difficulty(timestamps, cumulative_difficulties, target);
+  return next_difficulty(timestamps, cumulative_difficulties, target, bei.height);
 }
 //------------------------------------------------------------------
 // This function does a sanity check on basic things that all miner
@@ -1039,7 +1029,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
 
   std::vector<size_t> last_blocks_sizes;
   get_last_n_blocks_sizes(last_blocks_sizes, CRYPTONOTE_REWARD_BLOCKS_WINDOW);
-  if (!get_block_reward(epee::misc_utils::median(last_blocks_sizes), cumulative_block_size, already_generated_coins, base_reward, version))
+  if (!get_block_reward(epee::misc_utils::median(last_blocks_sizes), cumulative_block_size, already_generated_coins, base_reward, version, get_block_height(b), m_testnet))
   {
     MERROR_VER("block size " << cumulative_block_size << " is bigger than allowed for this blockchain");
     return false;
@@ -1198,8 +1188,8 @@ bool Blockchain::create_block_template(block& b, const account_public_address& m
    */
   //make blocks coin-base tx looks close to real coinbase tx to get truthful blob size
   uint8_t hf_version = m_hardfork->get_current_version();
-  size_t max_outs = hf_version >= 4 ? 1 : 11;
-  bool r = construct_miner_tx(height, median_size, already_generated_coins, txs_size, fee, miner_address, b.miner_tx, ex_nonce, max_outs, hf_version);
+  size_t max_outs = hf_version >= 2 ? 1 : 11;
+  bool r = construct_miner_tx(height, median_size, already_generated_coins, txs_size, fee, miner_address, b.miner_tx, ex_nonce, max_outs, hf_version, m_testnet);
   CHECK_AND_ASSERT_MES(r, false, "Failed to construct miner tx, first chance");
   size_t cumulative_size = txs_size + get_object_blobsize(b.miner_tx);
 #if defined(DEBUG_CREATE_BLOCK_TEMPLATE)
@@ -1208,7 +1198,7 @@ bool Blockchain::create_block_template(block& b, const account_public_address& m
 #endif
   for (size_t try_count = 0; try_count != 10; ++try_count)
   {
-    r = construct_miner_tx(height, median_size, already_generated_coins, cumulative_size, fee, miner_address, b.miner_tx, ex_nonce, max_outs, hf_version);
+    r = construct_miner_tx(height, median_size, already_generated_coins, cumulative_size, fee, miner_address, b.miner_tx, ex_nonce, max_outs, hf_version, m_testnet);
 
     CHECK_AND_ASSERT_MES(r, false, "Failed to construct miner tx, second chance");
     size_t coinbase_blob_size = get_object_blobsize(b.miner_tx);
@@ -2393,32 +2383,25 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
 
   // from hard fork 2, we forbid dust and compound outputs
   if (hf_version >= 2) {
-    for (auto &o: tx.vout) {
+    for (const auto &o: tx.vout) {
       if (tx.version == 1)
       {
+        // forbid dust and compound outputs
         if (!is_valid_decomposed_amount(o.amount)) {
           tvc.m_invalid_output = true;
           return false;
         }
       }
-    }
-  }
-
-  // in a v2 tx, all outputs must have 0 amount
-  if (hf_version >= 3) {
-    if (tx.version >= 2) {
-      for (auto &o: tx.vout) {
+      else if (tx.version >= 2)
+      {
+        // all outputs must have 0 amount
         if (o.amount != 0) {
           tvc.m_invalid_output = true;
           return false;
         }
       }
-    }
-  }
 
-  // from v4, forbid invalid pubkeys
-  if (hf_version >= 4) {
-    for (const auto &o: tx.vout) {
+      // Forbid invalid pubkeys
       if (o.target.type() == typeid(txout_to_key)) {
         const txout_to_key& out_to_key = boost::get<txout_to_key>(o.target);
         if (!crypto::check_key(out_to_key.key)) {
@@ -2429,16 +2412,23 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v7, allow bulletproofs
-  if (hf_version < 7 || !m_testnet) {
+  // From v7 of Monero, allow bulletproofs, as an
+  // assumption of next version of AEON
+  // 
+  // Commented out for now, as we don't want to check for bulletproofs 
+  // when second version of AEON goes on mainnet
+
+  /*
+  if (hf_version < 3 || !m_testnet) {
     if (!tx.rct_signatures.p.bulletproofs.empty())
     {
-      MERROR("Bulletproofs are not allowed before v7 or on mainnet");
+      MERROR("Bulletproofs are not allowed before v3 or on mainnet");
       tvc.m_invalid_output = true;
       return false;
     }
   }
-
+  */
+ 
   return true;
 }
 //------------------------------------------------------------------
@@ -2591,7 +2581,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
     }
 
     // min/max tx version based on HF, and we accept v1 txes if having a non mixable
-    const size_t max_tx_version = (hf_version <= 3) ? 1 : 2;
+    const size_t max_tx_version = (hf_version <= 1) ? 1 : 2;
     if (tx.version > max_tx_version)
     {
       MERROR_VER("transaction version " << (unsigned)tx.version << " is higher than max accepted version " << max_tx_version);
@@ -2607,7 +2597,6 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
     }
   }
 
-  // from v7, sorted ins
   if (hf_version >= 7) {
     const crypto::key_image *last_key_image = NULL;
     for (size_t n = 0; n < tx.vin.size(); ++n)
@@ -2923,7 +2912,7 @@ static uint64_t get_fee_quantization_mask()
 uint64_t Blockchain::get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size, uint8_t version)
 {
   const uint64_t min_block_size = get_min_block_size(version);
-  const uint64_t fee_per_kb_base = version >= 5 ? DYNAMIC_FEE_PER_KB_BASE_FEE_V5 : DYNAMIC_FEE_PER_KB_BASE_FEE;
+  const uint64_t fee_per_kb_base = version >= 2 ? DYNAMIC_FEE_PER_KB_BASE_FEE_V2 : DYNAMIC_FEE_PER_KB_BASE_FEE_V1;
 
   if (median_block_size < min_block_size)
     median_block_size = min_block_size;
@@ -2951,6 +2940,10 @@ bool Blockchain::check_fee(size_t blob_size, uint64_t fee) const
 {
   const uint8_t version = get_current_hard_fork_version();
 
+  if(version <= 1) {
+    return DEFAULT_FEE;
+  }
+
   uint64_t fee_per_kb;
   if (version < HF_VERSION_DYNAMIC_FEE)
   {
@@ -2961,7 +2954,7 @@ bool Blockchain::check_fee(size_t blob_size, uint64_t fee) const
     uint64_t median = m_current_block_cumul_sz_limit / 2;
     uint64_t already_generated_coins = m_db->height() ? m_db->get_block_already_generated_coins(m_db->height() - 1) : 0;
     uint64_t base_reward;
-    if (!get_block_reward(median, 1, already_generated_coins, base_reward, version))
+    if (!get_block_reward(median, 1, already_generated_coins, base_reward, version, m_db->height(), m_testnet))
       return false;
     fee_per_kb = get_dynamic_per_kb_fee(base_reward, median, version);
   }
@@ -3002,7 +2995,7 @@ uint64_t Blockchain::get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks) cons
 
   uint64_t already_generated_coins = m_db->height() ? m_db->get_block_already_generated_coins(m_db->height() - 1) : 0;
   uint64_t base_reward;
-  if (!get_block_reward(median, 1, already_generated_coins, base_reward, version))
+  if (!get_block_reward(median, 1, already_generated_coins, base_reward, version, m_db->height(), m_testnet))
   {
     MERROR("Failed to determine block reward, using placeholder " << print_money(BLOCK_REWARD_OVERESTIMATE) << " as a high bound");
     base_reward = BLOCK_REWARD_OVERESTIMATE;
@@ -4293,7 +4286,7 @@ bool Blockchain::get_hard_fork_voting_info(uint8_t version, uint32_t &window, ui
 
 uint64_t Blockchain::get_difficulty_target() const
 {
-  return get_current_hard_fork_version() < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
+  return DIFFICULTY_TARGET;
 }
 
 std::map<uint64_t, std::tuple<uint64_t, uint64_t, uint64_t>> Blockchain:: get_output_histogram(const std::vector<uint64_t> &amounts, bool unlocked, uint64_t recent_cutoff) const

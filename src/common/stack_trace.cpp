@@ -1,4 +1,4 @@
-// Copyright (c) 2016, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -28,7 +28,10 @@
 
 #if !defined __GNUC__ || defined __MINGW32__ || defined __MINGW64__ || defined __ANDROID__
 #define USE_UNWIND
+#else
+#define ELPP_FEATURE_CRASH_LOG 1
 #endif
+#include "easylogging++/easylogging++.h"
 
 #include <stdexcept>
 #ifdef USE_UNWIND
@@ -43,10 +46,10 @@
 #include "common/stack_trace.h"
 #include "misc_log_ex.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "stacktrace"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "stacktrace"
 
-#define ST_LOG(x) CINFO(el::base::Writer,el::base::DispatchAction::FileOnlyLog,MONERO_DEFAULT_LOG_CATEGORY) << x
+#define ST_LOG(x) CINFO(el::base::Writer,el::base::DispatchAction::FileOnlyLog,AEON_DEFAULT_LOG_CATEGORY) << x
 
 // from http://stackoverflow.com/questions/11665829/how-can-i-print-stack-trace-for-caught-exceptions-in-c-code-injection-in-c
 

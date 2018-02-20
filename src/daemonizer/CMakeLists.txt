@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -54,9 +54,9 @@ else()
   )
 endif()
 
-monero_private_headers(daemonizer
+aeon_private_headers(daemonizer
   ${daemonizer_private_headers})
-monero_add_library(daemonizer
+aeon_add_library(daemonizer
   ${daemonizer_sources}
   ${daemonizer_headers}
   ${daemonizer_private_headers})

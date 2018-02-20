@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -33,15 +33,41 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 
+
+// Left-monerovers
+#define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
+#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5    300000
+#define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)2000000000) // 2 * pow(10,9)
+#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              100
+// ----------------
+
+
+
+
+#define HARDFORK_1_HEIGHT                               592000
+#define HARDFORK_1_OLD_TARGET                           60
+#define HARDFORK_1_OLD_SPEED_FACTOR                     (20)
+#define AFTER_HARDFORK_SPEED_FACTOR                     (18)
+#define HARDFORK_1_POW_SPEED_MULTIPLIER                 2
+#define HARDFORK_1_DIFFADJ                              HARDFORK_1_POW_SPEED_MULTIPLIER
+#define HARDFORK_1_DIFFADJ_WINDOW                       360
+
 #define CRYPTONOTE_DNS_TIMEOUT_MS                       20000
 
 #define CRYPTONOTE_MAX_BLOCK_NUMBER                     500000000
 #define CRYPTONOTE_MAX_BLOCK_SIZE                       500000000  // block header blob limit, never used!
-#define CRYPTONOTE_GETBLOCKTEMPLATE_MAX_BLOCK_SIZE	196608 //size of block (bytes) that is the maximum that miners will produce
+#define CRYPTONOTE_GETBLOCKTEMPLATE_MAX_BLOCK_SIZE	    196608 //size of block (bytes) that is the maximum that miners will produce
 #define CRYPTONOTE_MAX_TX_SIZE                          1000000000
 #define CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER          0
 #define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW            60
-#define CURRENT_TRANSACTION_VERSION                     2
+
+// --NOTE--
+// AEON v0.9.14.0 has no version, and rebase is set as version 1, with version 2 here and 
+// elsewhere meant to serve as placeholders, in order to allow for easier future development.
+// Take note that you will see this reflected in the define naming convention as well, 
+// whenever you happen upon a *_V1 and *_V2 pair and are confused as to why a second
+// version even exists in the first place
+#define CURRENT_TRANSACTION_VERSION                     1
 #define CURRENT_BLOCK_MAJOR_VERSION                     1
 #define CURRENT_BLOCK_MINOR_VERSION                     0
 #define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT              60*60*2
@@ -51,13 +77,15 @@
 
 // MONEY_SUPPLY - total number coins to be generated
 #define MONEY_SUPPLY                                    ((uint64_t)(-1))
-#define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
 #define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000000) // 3 * pow(10, 11)
 
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
-#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    60000 //size of block (bytes) after which reward for block calculated using block size
-#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1    20000 //size of block (bytes) after which reward for block calculated using block size - before first fork
-#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5    300000 //size of block (bytes) after which reward for block calculated using block size - second change, from v5
+
+#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1    20000   //size of block (bytes) after which reward for block calculated using block size - before first fork
+#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_LIMBO 60000   //(previously V2) 
+#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    300000  //(previously V5) size of block (bytes) after which reward for block calculated using block size
+
+
 #define CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE          600
 #define CRYPTONOTE_DISPLAY_DECIMAL_POINT                12
 // COIN - number of smallest units in one coin
@@ -65,35 +93,36 @@
 
 #define FEE_PER_KB_OLD                                  ((uint64_t)10000000000) // pow(10, 10)
 #define FEE_PER_KB                                      ((uint64_t)2000000000) // 2 * pow(10, 9)
-#define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)2000000000) // 2 * pow(10,9)
+#define DEFAULT_FEE                                     ((uint64_t)10000000000) // pow(10, 10)
+#define MINIMUM_RELAY_FEE                               ((uint64_t)1000000) // pow(10, 6)
+#define DYNAMIC_FEE_PER_KB_BASE_FEE_V1                  ((uint64_t)2000000000) // 2 * pow(10,9)
 #define DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD            ((uint64_t)10000000000000) // 10 * pow(10,12)
-#define DYNAMIC_FEE_PER_KB_BASE_FEE_V5                  ((uint64_t)2000000000 * (uint64_t)CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 / CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5)
+#define DYNAMIC_FEE_PER_KB_BASE_FEE_V2                  ((uint64_t)2000000000 * (uint64_t)CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_LIMBO / CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2)
 
 #define ORPHANED_BLOCKS_MAX_COUNT                       100
 
 
-#define DIFFICULTY_TARGET_V2                            120  // seconds
-#define DIFFICULTY_TARGET_V1                            60  // seconds - before first fork
+#define DIFFICULTY_TARGET                               240  // seconds
 #define DIFFICULTY_WINDOW                               720 // blocks
 #define DIFFICULTY_LAG                                  15  // !!!
 #define DIFFICULTY_CUT                                  60  // timestamps to cut after sorting
 #define DIFFICULTY_BLOCKS_COUNT                         DIFFICULTY_WINDOW + DIFFICULTY_LAG
 
 
-#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1   DIFFICULTY_TARGET_V1 * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
-#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V2   DIFFICULTY_TARGET_V2 * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
+#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
+#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V2   DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
 
 
-#define DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN             DIFFICULTY_TARGET_V1 //just alias; used by tests
+#define DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN             DIFFICULTY_TARGET //just alias; used by tests
 
 
 #define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  //by default, blocks ids count in synchronizing
-#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_PRE_V4       100    //by default, blocks count in blocks downloading
-#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              20     //by default, blocks count in blocks downloading
+#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_V1           200    //by default, blocks count in blocks downloading
+#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_V2           20     //by default, blocks count in blocks downloading
 
-#define CRYPTONOTE_MEMPOOL_TX_LIVETIME                    86400 //seconds, one day
-#define CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME     604800 //seconds, one week
+#define CRYPTONOTE_MEMPOOL_TX_LIVETIME                  86400 //seconds, one day
+#define CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME   604800 //seconds, one week
 
 #define COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT           1000
 
@@ -121,57 +150,75 @@
 
 #define ALLOW_DEBUG_COMMANDS
 
-#define CRYPTONOTE_NAME                         "bitmonero"
-#define CRYPTONOTE_POOLDATA_FILENAME            "poolstate.bin"
-#define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
-#define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
-#define P2P_NET_DATA_FILENAME                   "p2pstate.bin"
-#define MINER_CONFIG_FILE_NAME                  "miner_conf.json"
+#define CRYPTONOTE_NAME                                 "aeon2"
+#define CRYPTONOTE_POOLDATA_FILENAME                    "poolstate.bin"
+#define CRYPTONOTE_BLOCKCHAINDATA_FILENAME              "data.mdb"
+#define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME         "lock.mdb"
+#define P2P_NET_DATA_FILENAME                           "p2pstate.bin"
+#define MINER_CONFIG_FILE_NAME                          "miner_conf.json"
 
-#define THREAD_STACK_SIZE                       5 * 1024 * 1024
+#define THREAD_STACK_SIZE                               5 * 1024 * 1024
 
-#define HF_VERSION_DYNAMIC_FEE                  4
-#define HF_VERSION_MIN_MIXIN_4                  6
-#define HF_VERSION_ENFORCE_RCT                  6
+#define HF_VERSION_DYNAMIC_FEE                          2
+#define HF_VERSION_MIN_MIXIN_4                          2
+#define HF_VERSION_ENFORCE_RCT                          2
 
-#define PER_KB_FEE_QUANTIZATION_DECIMALS        8
+#define PER_KB_FEE_QUANTIZATION_DECIMALS                8
 
-#define HASH_OF_HASHES_STEP                     256
+#define HASH_OF_HASHES_STEP                             256
 
+#define DONATION_URL                                    "donate.aeon.cash"
+#define DONATION_EMAIL_ADDRESS                          "donate@aeon.cash"
 
 // New constants are intended to go here
 namespace config
 {
-  uint64_t const DEFAULT_FEE_ATOMIC_XMR_PER_KB = 500; // Just a placeholder!  Change me!
   uint8_t const FEE_CALCULATION_MAX_RETRIES = 10;
+
+  uint16_t const P2P_DEFAULT_PORT = 11180;
+  uint16_t const RPC_DEFAULT_PORT = 11181;
+  uint16_t const ZMQ_RPC_DEFAULT_PORT = 18082;
+
+  uint32_t const GENESIS_NONCE = 10000;
+
+  uint64_t const DEFAULT_FEE_ATOMIC_XMR_PER_KB = 500; // Just a placeholder!  Change me!
   uint64_t const DEFAULT_DUST_THRESHOLD = ((uint64_t)2000000000); // 2 * pow(10, 9)
   uint64_t const BASE_REWARD_CLAMP_THRESHOLD = ((uint64_t)100000000); // pow(10, 8)
-  std::string const P2P_REMOTE_DEBUG_TRUSTED_PUB_KEY = "0000000000000000000000000000000000000000000000000000000000000000";
-
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 18;
+  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0xB2; // Wallet Starts with Wm;
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 19;
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 42;
-  uint16_t const P2P_DEFAULT_PORT = 18080;
-  uint16_t const RPC_DEFAULT_PORT = 18081;
-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 18082;
-  boost::uuids::uuid const NETWORK_ID = { {
-      0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
-    } }; // Bender's nightmare
-  std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
-  uint32_t const GENESIS_NONCE = 10000;
+
+  std::string const P2P_REMOTE_DEBUG_TRUSTED_PUB_KEY = "0000000000000000000000000000000000000000000000000000000000000000";
+
+  boost::uuids::uuid const NETWORK_ID = { 
+    { 0x32 ,0x32, 0xF3, 0x91 , 0x81, 0x18 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10 } 
+  }; // Bender's nightmare AEON MAINNET
+  
+  std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121012bf2d282da90cee9c7a28c16e81418101ee28607d9e50f706594ee144a453b68";
+  
+  std::string const DONATION_AEON_WALLET_ADDRESS = "WmsSWgtT1JPg5e3cK41hKXSHVpKW7e47bjgiKmWZkYrhSS5LhRemNyqayaSBtAQ6517eo5PtH9wxHVmM78JDZSUu2W8PqRiNs";
+  std::string const DONATION_AEON_WALLET_PUBLIC_VIEWKEY = "71bf19a7348ede17fa487167710dac401ef1556851bfd36b76040facf051630b";
+  std::string const DONATION_BITCOIN_WALLET_ADDRESS = "12Cyjf3qV6qLyXdzpLSLPdRFPUVidvnzFM";
 
   namespace testnet
   {
-    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;
-    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 54;
-    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
-    uint16_t const P2P_DEFAULT_PORT = 28080;
-    uint16_t const RPC_DEFAULT_PORT = 28081;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 28082;
-    boost::uuids::uuid const NETWORK_ID = { {
-        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x11
-      } }; // Bender's daydream
-    std::string const GENESIS_TX = "013c01ff0001ffffffffffff0f029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101168d0c4ca86fb55a4cf6a36d31431be1c53a3bd7411bb24e8832410289fa6f3b";
+    uint16_t const P2P_DEFAULT_PORT = 21180;
+    uint16_t const RPC_DEFAULT_PORT = 21181;
+    uint16_t const ZMQ_RPC_DEFAULT_PORT = 21382;
+
     uint32_t const GENESIS_NONCE = 10001;
+
+    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x6b3; // Wallet Starts with Wx
+    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x2133; //Starts with Wz
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 41;
+
+    boost::uuids::uuid const NETWORK_ID = { 
+      { 0x32 ,0x32, 0xF3, 0x91 , 0x81, 0x18 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x31 } 
+    }; // Bender's daydream AEON TESTNET
+
+    std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017123ef38e42232c020ea3744a390f3e9ccd2adc1cd77edfa43ac32637435b8a7"; //Avaengers Test Net
+    
+    std::string const DONATION_AEON_WALLET_ADDRESS = "Wx22Jx6NsuXViqX6dGiM1gXdzZBphgpPBAo1WMG8HdxLQUXKzn48X4sFXHKUbtjmDNUkmuurbFvA9HmNSh7cVDwT2KoiMvVoY";
+    std::string const DONATION_AEON_WALLET_PUBLIC_VIEWKEY = "55df2eb6cfc056d2692a405442bda5ef47d4cc898576643b3a2248bffed69a3c";
   }
 }

@@ -1,0 +1,21 @@
+[Unit]
+Description=AEON Full Node
+After=network.target
+
+[Service]
+User=aeon
+Group=aeon
+WorkingDirectory=~
+RuntimeDirectory=aeon
+
+Type=forking
+PIDFile=/run/aeon/aeond.pid
+
+ExecStart=/usr/bin/aeond --config-file /etc/aeond.conf \
+    --detach --pidfile /run/aeon/aeond.pid
+
+Restart=always
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

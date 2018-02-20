@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -41,8 +41,8 @@
 #include "profile_tools.h"
 #include "ringct/rctOps.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "blockchain.db.lmdb"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "blockchain.db.lmdb"
 
 
 #if defined(__i386) || defined(__x86_64)
@@ -3216,7 +3216,7 @@ void BlockchainLMDB::fixup()
     ptr = (char *)k.mv_data; \
     ptr[sizeof(name)-2] = 's'
 
-#define LOGIF(y)    if (ELPP->vRegistry()->allowed(y, MONERO_DEFAULT_LOG_CATEGORY))
+#define LOGIF(y)    if (ELPP->vRegistry()->allowed(y, AEON_DEFAULT_LOG_CATEGORY))
 
 void BlockchainLMDB::migrate_0_1()
 {

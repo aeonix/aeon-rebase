@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -62,7 +62,7 @@ using namespace epee;
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "common/json_util.h"
-#include "common/memwipe.h"
+#include "memwipe.h"
 #include "common/base58.h"
 #include "ringct/rctSigs.h"
 
@@ -75,8 +75,8 @@ using namespace std;
 using namespace crypto;
 using namespace cryptonote;
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "wallet.wallet2"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "wallet.wallet2"
 
 // used to choose when to stop adding outputs to a tx
 #define APPROXIMATE_INPUT_BYTES 80
@@ -87,9 +87,9 @@ using namespace cryptonote;
 // arbitrary, used to generate different hashes from the same input
 #define CHACHA8_KEY_TAIL 0x8c
 
-#define UNSIGNED_TX_PREFIX "Monero unsigned tx set\004"
-#define SIGNED_TX_PREFIX "Monero signed tx set\004"
-#define MULTISIG_UNSIGNED_TX_PREFIX "Monero multisig unsigned tx set\001"
+#define UNSIGNED_TX_PREFIX "AEON unsigned tx set\004"
+#define SIGNED_TX_PREFIX "AEON signed tx set\004"
+#define MULTISIG_UNSIGNED_TX_PREFIX "AEON multisig unsigned tx set\001"
 
 #define RECENT_OUTPUT_RATIO (0.5) // 50% of outputs are from the recent zone
 #define RECENT_OUTPUT_ZONE ((time_t)(1.8 * 86400)) // last 1.8 day makes up the recent zone (taken from monerolink.pdf, Miller et al)
@@ -101,9 +101,9 @@ using namespace cryptonote;
 #define SUBADDRESS_LOOKAHEAD_MAJOR 50
 #define SUBADDRESS_LOOKAHEAD_MINOR 200
 
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Monero key image export\002"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "AEON key image export\002"
 
-#define MULTISIG_EXPORT_FILE_MAGIC "Monero multisig export\001"
+#define MULTISIG_EXPORT_FILE_MAGIC "AEON multisig export\001"
 
 namespace
 {
@@ -135,6 +135,10 @@ void do_prepare_file_names(const std::string& file_path, std::string& keys_file,
 
 uint64_t calculate_fee(uint64_t fee_per_kb, size_t bytes, uint64_t fee_multiplier)
 {
+  if(CURRENT_TRANSACTION_VERSION <= 1) {
+    return DEFAULT_FEE;
+  }
+
   uint64_t kB = (bytes + 1023) / 1024;
   return kB * fee_per_kb * fee_multiplier;
 }
@@ -296,7 +300,7 @@ std::unique_ptr<tools::wallet2> generate_from_json(const std::string& json_file,
       if (field_seed_passphrase_found)
       {
         if (!field_seed_passphrase.empty())
-          recovery_key = cryptonote::decrypt_key(recovery_key, field_seed_passphrase);
+          recovery_key = cryptonote::decrypt_key(recovery_key, field_seed_passphrase, wallet->estimate_blockchain_height());
       }
     }
 
@@ -709,7 +713,7 @@ bool wallet2::get_seed(std::string& electrum_words, const epee::wipeable_string 
 
   crypto::secret_key key = get_account().get_keys().m_spend_secret_key;
   if (!passphrase.empty())
-    key = cryptonote::encrypt_key(key, passphrase);
+    key = cryptonote::encrypt_key(key, passphrase, m_blockchain.size());
   crypto::ElectrumWords::bytes_to_words(key, electrum_words, seed_language);
 
   return true;
@@ -816,7 +820,7 @@ void wallet2::expand_subaddresses(const cryptonote::subaddress_index& index)
     m_subaddress_labels.resize(index.major + 1, {"Untitled account"});
     m_subaddress_labels[index.major].resize(index.minor + 1);
   }
-  else if (m_subaddress_labels[index.major].size() <= index.minor)
+  else if (m_subaddress_labels.size() >= index.major && m_subaddress_labels[index.major].size() <= index.minor)
   {
     // add new subaddresses
     cryptonote::subaddress_index index2 = index;
@@ -2651,7 +2655,7 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const epee::wip
 
   // -1 month for fluctuations in block time and machine date/time setup.
   // avg seconds per block
-  const int seconds_per_block = DIFFICULTY_TARGET_V2;
+  const int seconds_per_block = DIFFICULTY_TARGET;
   // ~num blocks per month
   const uint64_t blocks_per_month = 60*60*24*30/seconds_per_block;
 
@@ -2685,7 +2689,7 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const epee::wip
  {
    // -1 month for fluctuations in block time and machine date/time setup.
    // avg seconds per block
-   const int seconds_per_block = DIFFICULTY_TARGET_V2;
+   const int seconds_per_block = DIFFICULTY_TARGET;
    // ~num blocks per month
    const uint64_t blocks_per_month = 60*60*24*30/seconds_per_block;
 
@@ -4876,7 +4880,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions(std::vector<crypto
 	  transfer(dst_vector, fake_outs_count, unused_transfers_indices, unlock_time, needed_fee, extra, tx, ptx, trusted_daemon);
 	  auto txBlob = t_serializable_object_to_blob(ptx.tx);
           needed_fee = calculate_fee(fee_per_kb, txBlob, fee_multiplier);
-	} while (ptx.fee < needed_fee);
+	} while (ptx.fee < needed_fee || ptx.fee < DEFAULT_FEE);
 
         ptx_vector.push_back(ptx);
 
@@ -6968,7 +6972,13 @@ uint64_t wallet2::get_upper_transaction_size_limit()
 {
   if (m_upper_transaction_size_limit > 0)
     return m_upper_transaction_size_limit;
-  uint64_t full_reward_zone = use_fork_rules(5, 10) ? CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5 : use_fork_rules(2, 10) ? CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 : CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+
+  uint64_t full_reward_zone = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1; 
+  uint64_t height = m_blockchain.size() - 1;
+
+  if (height < HARDFORK_1_HEIGHT)
+    full_reward_zone = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+
   return full_reward_zone - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
 }
 //----------------------------------------------------------------------------------------------------
@@ -7772,7 +7782,7 @@ uint64_t wallet2::get_approximate_blockchain_height() const
   // v2 fork block
   const uint64_t fork_block = m_testnet ? 624634 : 1009827;
   // avg seconds per block
-  const int seconds_per_block = DIFFICULTY_TARGET_V2;
+  const int seconds_per_block = DIFFICULTY_TARGET;
   // Calculated blockchain height
   uint64_t approx_blockchain_height = fork_block + (time(NULL) - fork_time)/seconds_per_block;
   // testnet got some huge rollbacks, so the estimation is way off
@@ -8738,7 +8748,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
     }
   }
 
-  std::string uri = "monero:" + address;
+  std::string uri = "aeon:" + address;
   unsigned int n_fields = 0;
 
   if (!payment_id.empty())
@@ -8767,9 +8777,9 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 //----------------------------------------------------------------------------------------------------
 bool wallet2::parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error)
 {
-  if (uri.substr(0, 7) != "monero:")
+  if (uri.substr(0, 7) != "aeon:")
   {
-    error = std::string("URI has wrong scheme (expected \"monero:\"): ") + uri;
+    error = std::string("URI has wrong scheme (expected \"aeon:\"): ") + uri;
     return false;
   }
 
@@ -9001,7 +9011,7 @@ std::vector<std::pair<uint64_t, uint64_t>> wallet2::estimate_backlog(uint64_t mi
     uint64_t nblocks_min = priority_size_min / full_reward_zone;
     uint64_t nblocks_max = priority_size_max / full_reward_zone;
     MDEBUG("estimate_backlog: priority_size " << priority_size_min << " - " << priority_size_max << " for " << fee
-        << " (" << our_fee_byte_min << " - " << our_fee_byte_max << " piconero byte fee), "
+        << " (" << our_fee_byte_min << " - " << our_fee_byte_max << " picaeon byte fee), "
         << nblocks_min << " - " << nblocks_max << " blocks at block size " << full_reward_zone);
     blocks.push_back(std::make_pair(nblocks_min, nblocks_max));
   }
@@ -9011,11 +9021,11 @@ std::vector<std::pair<uint64_t, uint64_t>> wallet2::estimate_backlog(uint64_t mi
 void wallet2::generate_genesis(cryptonote::block& b) {
   if (m_testnet)
   {
-    cryptonote::generate_genesis_block(b, config::testnet::GENESIS_TX, config::testnet::GENESIS_NONCE);
+    cryptonote::generate_genesis_block(b, config::testnet::GENESIS_TX, config::testnet::GENESIS_NONCE, m_testnet);
   }
   else
   {
-    cryptonote::generate_genesis_block(b, config::GENESIS_TX, config::GENESIS_NONCE);
+    cryptonote::generate_genesis_block(b, config::GENESIS_TX, config::GENESIS_NONCE, m_testnet);
   }
 }
 }

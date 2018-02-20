@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -62,7 +62,7 @@ public:
   bool test()
   {
     crypto::hash hash;
-    crypto::cn_slow_hash(&m_data, sizeof(m_data), hash);
+    crypto::cn_slow_hash_2m(&m_data, sizeof(m_data), hash);
     return hash == m_expected_hash;
   }
 

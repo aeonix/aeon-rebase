@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -58,7 +58,7 @@ extern "C" typedef void hash_f(const void *, size_t, char *);
 struct hash_func {
   const string name;
   hash_f &f;
-} hashes[] = {{"fast", cn_fast_hash}, {"slow", cn_slow_hash}, {"tree", hash_tree},
+} hashes[] = {{"fast", cn_fast_hash}, {"slow", cn_slow_hash_2m}, {"tree", hash_tree},
   {"extra-blake", hash_extra_blake}, {"extra-groestl", hash_extra_groestl},
   {"extra-jh", hash_extra_jh}, {"extra-skein", hash_extra_skein}};
 

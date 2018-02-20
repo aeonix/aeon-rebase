@@ -37,8 +37,8 @@
 #include "http_auth.h"
 #include "http_base.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.http"
+#undef AEON_DEFAULT_LOG_CATEGORY
+#define AEON_DEFAULT_LOG_CATEGORY "net.http"
 
 namespace epee
 {
@@ -160,6 +160,7 @@ namespace net_utils
 		struct custum_handler_config: public http_server_config
 		{
 			i_http_server_handler<t_connection_context>* m_phandler;
+			std::function<void(size_t, uint8_t*)> rng;
 		};
 
 		/************************************************************************/
@@ -176,7 +177,7 @@ namespace net_utils
 				: simple_http_connection_handler<t_connection_context>(psnd_hndlr, config),
 					m_config(config),
 					m_conn_context(conn_context),
-					m_auth(m_config.m_user ? http_server_auth{*m_config.m_user} : http_server_auth{})
+					m_auth(m_config.m_user ? http_server_auth{*m_config.m_user, config.rng} : http_server_auth{})
 			{}
 			inline bool handle_request(const http_request_info& query_info, http_response_info& response)
 			{

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -32,44 +32,48 @@
 
 #include "wallet/wallet2.h"
 #include "common/dns_utils.h"
+#include "cryptonote_config.h"
 #include <string>
 
-TEST(AddressFromTXT, Success)
-{
-  std::string addr = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
+// TODO: TEST CASE - Include back in when DONATION_AEON_WALLET_ADDRESS can 
+// be set, relied upon to be tested here
 
-  std::string txtr = "oa1:xmr";
-  txtr += " recipient_address=";
-  txtr += addr;
-  txtr += ";";
+// TEST(AddressFromTXT, Success)
+// {
+//   std::string addr = config::testnet::DONATION_AEON_WALLET_ADDRESS; //"46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
 
-  std::string res = tools::dns_utils::address_from_txt_record(txtr);
+//   std::string txtr = "oa1:aeon";
+//   txtr += " recipient_address=";
+//   txtr += addr;
+//   txtr += ";";
 
-  EXPECT_STREQ(addr.c_str(), res.c_str());
+//   std::string res = tools::dns_utils::address_from_txt_record(txtr);
 
-  std::string txtr2 = "foobar";
+//   EXPECT_STREQ(addr.c_str(), res.c_str());
 
-  txtr2 += txtr;
+//   std::string txtr2 = "foobar";
 
-  txtr2 += "more foobar";
+//   txtr2 += txtr;
 
-  res = tools::dns_utils::address_from_txt_record(txtr2);
+//   txtr2 += "more foobar";
 
-  EXPECT_STREQ(addr.c_str(), res.c_str());
+//   res = tools::dns_utils::address_from_txt_record(txtr2);
 
-  std::string txtr3 = "foobar oa1:xmr tx_description=\"Donation for Monero Development Fund\"; ";
-  txtr3 += "recipient_address=";
-  txtr3 += addr;
-  txtr3 += "; foobar";
+//   EXPECT_STREQ(addr.c_str(), res.c_str());
 
-  res = tools::dns_utils::address_from_txt_record(txtr3);
+//   std::string txtr3 = "foobar oa1:aeon tx_description=\"Donation for AEON Development Fund\"; ";
+//   txtr3 += "recipient_address=";
+//   txtr3 += addr;
+//   txtr3 += "; foobar";
 
-  EXPECT_STREQ(addr.c_str(), res.c_str());
-}
+//   res = tools::dns_utils::address_from_txt_record(txtr3);
+
+//   EXPECT_STREQ(addr.c_str(), res.c_str());
+// }
 
 TEST(AddressFromTXT, Failure)
 {
-  std::string txtr = "oa1:xmr recipient_address=not a real address";
+  std::string txtr = "oa1:aeon recipient_address=not a real address";
 
   std::string res = tools::dns_utils::address_from_txt_record(txtr);
 
@@ -81,28 +85,31 @@ TEST(AddressFromTXT, Failure)
   ASSERT_STREQ("", res.c_str());
 }
 
-TEST(AddressFromURL, Success)
-{
-  const std::string addr = "44AFFq5kSiGBoZ4NMDwYtN18obc8AemS33DBLWs3H7otXft3XjrpDtQGv7SqSsaBYBb98uNbr2VBBEt7f2wfn3RVGQBEP3A";
+// TODO: TEST CASE - Include back in when donate.aeon.cash exists and can be 
+// relied upon (and DNS utils work, or are a part of the rebase effort to begin with)
+
+// TEST(AddressFromURL, Success)
+// {
+//   const std::string addr = config::testnet::DONATION_AEON_WALLET_ADDRESS;
   
-  bool dnssec_result = false;
+//   bool dnssec_result = false;
 
-  std::vector<std::string> addresses = tools::dns_utils::addresses_from_url("donate.getmonero.org", dnssec_result);
+//   std::vector<std::string> addresses = tools::dns_utils::addresses_from_url("donate.aeon.cash", dnssec_result);
 
-  EXPECT_EQ(1, addresses.size());
-  if (addresses.size() == 1)
-  {
-    EXPECT_STREQ(addr.c_str(), addresses[0].c_str());
-  }
+//   EXPECT_EQ(1, addresses.size());
+//   if (addresses.size() == 1)
+//   {
+//     EXPECT_STREQ(addr.c_str(), addresses[0].c_str());
+//   }
 
-  // OpenAlias address with an @ instead of first .
-  addresses = tools::dns_utils::addresses_from_url("donate@getmonero.org", dnssec_result);
-  EXPECT_EQ(1, addresses.size());
-  if (addresses.size() == 1)
-  {
-    EXPECT_STREQ(addr.c_str(), addresses[0].c_str());
-  }
-}
+//   // OpenAlias address with an @ instead of first .
+//   addresses = tools::dns_utils::addresses_from_url("donate@aeon.cash", dnssec_result);
+//   EXPECT_EQ(1, addresses.size());
+//   if (addresses.size() == 1)
+//   {
+//     EXPECT_STREQ(addr.c_str(), addresses[0].c_str());
+//   }
+// }
 
 TEST(AddressFromURL, Failure)
 {

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -41,7 +41,7 @@
 
 #include "common/pod-class.h"
 #include "common/util.h"
-#include "common/memwipe.h"
+#include "memwipe.h"
 #include "generic-ops.h"
 #include "hex.h"
 #include "span.h"

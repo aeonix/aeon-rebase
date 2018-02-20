@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -39,6 +39,7 @@
 #include "wipeable_string.h"
 using namespace epee;
 
+#include "crypto/crypto.h"
 #include "util.h"
 #include "memwipe.h"
 #include "cryptonote_config.h"

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 # 
 # All rights reserved.
 # 
@@ -54,4 +54,5 @@ if (BUILD_GUI_DEPS)
         ARCHIVE DESTINATION ${lib_folder}
         LIBRARY DESTINATION ${lib_folder})
 endif()
+set_property(TARGET easylogging APPEND PROPERTY COMPILE_FLAGS "-fPIC")
 
