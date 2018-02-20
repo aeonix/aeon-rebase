@@ -111,10 +111,10 @@ static const struct {
   // version 1 of the testnet starting from scratch until such time
   // that we go public with a testnet and determine if hard forking
   // from the top of the AEON mainnet blockchain is preferable 
-  { 1, 1, 0, 0 },
+  // { 1, 1, 0, 0 },
 };
 
-static const uint64_t testnet_hard_fork_version_1_till = 1000000000;
+static const uint64_t testnet_hard_fork_version_1_till = ((uint64_t)(-1));
 
 //------------------------------------------------------------------
 Blockchain::Blockchain(tx_memory_pool& tx_pool) :
