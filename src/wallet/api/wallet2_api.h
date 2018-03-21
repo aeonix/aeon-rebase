@@ -42,6 +42,7 @@ namespace Monero {
 
     namespace Utils {
         bool isAddressLocal(const std::string &hostaddr);
+        void onStartup();
     }
 
     template<typename T>
@@ -613,7 +614,7 @@ struct Wallet
      * \param dst_addr          destination address as string
      * \param payment_id        optional payment_id, can be empty string
      * \param amount            amount
-     * \param mixin_count       mixin count. if 0 passed, wallet will use default value
+     * \param ring_size         ring size. if 0 passed, wallet will use default value
      * \param subaddr_account   subaddress account from which the input funds are taken
      * \param subaddr_indices   set of subaddress indices to use for transfer or sweeping. if set empty, all are chosen when sweeping, and one or more are automatically chosen when transferring. after execution, returns the set of actually used indices
      * \param priority
@@ -622,7 +623,7 @@ struct Wallet
      */
 
     virtual PendingTransaction * createTransaction(const std::string &dst_addr, const std::string &payment_id,
-                                                   optional<uint64_t> amount, uint32_t mixin_count,
+                                                   optional<uint64_t> amount, uint32_t ring_size,
                                                    PendingTransaction::Priority = PendingTransaction::Priority_Low,
                                                    uint32_t subaddr_account = 0,
                                                    std::set<uint32_t> subaddr_indices = {}) = 0;

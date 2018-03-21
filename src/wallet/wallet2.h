@@ -49,7 +49,7 @@
 #include "cryptonote_basic/cryptonote_format_utils.h"
 #include "cryptonote_core/cryptonote_tx_utils.h"
 #include "common/unordered_containers_boost_serialization.h"
-#include "crypto/chacha8.h"
+#include "crypto/chacha.h"
 #include "crypto/hash.h"
 #include "ringct/rctTypes.h"
 #include "ringct/rctOps.h"
@@ -341,6 +341,7 @@ namespace tools
       std::unordered_set<rct::key> used_L;
       std::unordered_set<crypto::public_key> signing_keys;
       rct::multisig_out msout;
+      std::vector<std::vector<crypto::signature>> prerct_sigs;
     };
 
     // The convention for destinations is:
@@ -404,7 +405,7 @@ namespace tools
 
     struct keys_file_data
     {
-      crypto::chacha8_iv iv;
+      crypto::chacha_iv iv;
       std::string account_data;
 
       BEGIN_SERIALIZE_OBJECT()
@@ -415,7 +416,7 @@ namespace tools
 
     struct cache_file_data
     {
-      crypto::chacha8_iv iv;
+      crypto::chacha_iv iv;
       std::string cache_data;
 
       BEGIN_SERIALIZE_OBJECT()
@@ -792,8 +793,8 @@ namespace tools
     void print_ring_members(bool value) { m_print_ring_members = value; }
     bool store_tx_info() const { return m_store_tx_info; }
     void store_tx_info(bool store) { m_store_tx_info = store; }
-    uint32_t default_mixin() const { return m_default_mixin; }
-    void default_mixin(uint32_t m) { m_default_mixin = m; }
+    uint32_t default_ring_size() const { return m_default_ring_size; }
+    void default_ring_size(uint32_t m) { m_default_ring_size = m; }
     uint32_t get_default_priority() const { return m_default_priority; }
     void set_default_priority(uint32_t p) { m_default_priority = p; }
     bool auto_refresh() const { return m_auto_refresh; }
@@ -975,7 +976,7 @@ namespace tools
     void add_unconfirmed_tx(const cryptonote::transaction& tx, uint64_t amount_in, const std::vector<cryptonote::tx_destination_entry> &dests, const crypto::hash &payment_id, uint64_t change_amount, uint32_t subaddr_account, const std::set<uint32_t>& subaddr_indices);
     void generate_genesis(cryptonote::block& b);
     void check_genesis(const crypto::hash& genesis_hash) const; //throws
-    bool generate_chacha8_key_from_secret_keys(crypto::chacha8_key &key) const;
+    bool generate_chacha_key_from_secret_keys(crypto::chacha_key &key) const;
     crypto::hash get_payment_id(const pending_tx &ptx) const;
     void check_acc_out_precomp(const cryptonote::tx_out &o, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, size_t i, tx_scan_info_t &tx_scan_info) const;
     void parse_block_round(const cryptonote::blobdata &blob, cryptonote::block &bl, crypto::hash &bl_id, bool &error) const;
@@ -1045,7 +1046,7 @@ namespace tools
     bool m_always_confirm_transfers;
     bool m_print_ring_members;
     bool m_store_tx_info; /*!< request txkey to be returned in RPC, and store in the wallet cache file */
-    uint32_t m_default_mixin;
+    uint32_t m_default_ring_size;
     uint32_t m_default_priority;
     RefreshType m_refresh_type;
     bool m_auto_refresh;
@@ -1091,7 +1092,7 @@ BOOST_CLASS_VERSION(tools::wallet2::unsigned_tx_set, 0)
 BOOST_CLASS_VERSION(tools::wallet2::signed_tx_set, 0)
 BOOST_CLASS_VERSION(tools::wallet2::tx_construction_data, 2)
 BOOST_CLASS_VERSION(tools::wallet2::pending_tx, 3)
-BOOST_CLASS_VERSION(tools::wallet2::multisig_sig, 0)
+BOOST_CLASS_VERSION(tools::wallet2::multisig_sig, 1)
 
 namespace boost
 {
@@ -1423,6 +1424,9 @@ namespace boost
       a & x.used_L;
       a & x.signing_keys;
       a & x.msout;
+      if (ver < 1)
+        return;
+      a & x.prerct_sigs;
     }
 
     template <class Archive>

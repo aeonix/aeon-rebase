@@ -51,6 +51,18 @@ extern "C" {
     }
     tree_hash((const char (*)[32]) data, length >> 5, hash);
   }
+  static void cn_slow_hash_2m_0(const void *data, size_t length, char *hash) {
+    cn_slow_hash(data, length, hash, 0, 0);
+  }
+  static void cn_slow_hash_1m_0(const void *data, size_t length, char *hash) {
+    cn_slow_hash(data, length, hash, 1, 0);
+  }
+  static void cn_slow_hash_2m_1(const void *data, size_t length, char *hash) {
+    cn_slow_hash(data, length, hash, 0, 1);
+  }
+  static void cn_slow_hash_1m_1(const void *data, size_t length, char *hash) {
+    cn_slow_hash(data, length, hash, 1, 1);
+  }
 }
 POP_WARNINGS
 
@@ -58,9 +70,10 @@ extern "C" typedef void hash_f(const void *, size_t, char *);
 struct hash_func {
   const string name;
   hash_f &f;
-} hashes[] = {{"fast", cn_fast_hash}, {"slow", cn_slow_hash}, {"tree", hash_tree},
+} hashes[] = {{"fast", cn_fast_hash}, {"slow-2m", cn_slow_hash_2m_0}, {"slow-1m", cn_slow_hash_1m_0}, {"tree", hash_tree},
   {"extra-blake", hash_extra_blake}, {"extra-groestl", hash_extra_groestl},
-  {"extra-jh", hash_extra_jh}, {"extra-skein", hash_extra_skein}};
+  {"extra-jh", hash_extra_jh}, {"extra-skein", hash_extra_skein},
+  {"slow-2m-1", cn_slow_hash_2m_1}, {"slow-1m-1", cn_slow_hash_1m_1}};
 
 int main(int argc, char *argv[]) {
   hash_f *f;

@@ -779,6 +779,88 @@ namespace rct {
         return genRctSimple(message, inSk, destinations, inamounts, outamounts, txnFee, mixRing, amount_keys, kLRki, msout, index, outSk, false);
     }
 
+    void gen_prerct_multisig(const crypto::hash &prefix_hash, const std::vector<const crypto::public_key *> &pubs, const secret_key &sec, size_t sec_index, const multisig_kLRki &kLRki, multisig_out &msout, size_t msout_idx, crypto::signature *sig) {
+        CHECK_AND_ASSERT_THROW_MES(msout_idx < msout.c.size(), "Bad msout_idx");
+
+        // copied from crypto.cpp
+        struct ec_point_pair {
+            crypto::ec_point a, b;
+        };
+        struct rs_comm {
+            crypto::hash h;
+            struct ec_point_pair ab[];
+        };
+        auto rs_comm_size = [](size_t pubs_count) {
+            return sizeof(rs_comm) + pubs_count * sizeof(ec_point_pair);
+        };
+        auto hash_to_ec = [](const crypto::public_key &key, ge_p3 &res) {
+            crypto::hash h;
+            ge_p2 point;
+            ge_p1p1 point2;
+            cn_fast_hash(std::addressof(key), sizeof(crypto::public_key), h);
+            ge_fromfe_frombytes_vartime(&point, reinterpret_cast<const unsigned char *>(&h));
+            ge_mul8(&point2, &point);
+            ge_p1p1_to_p3(&res, &point2);
+        };
+
+        size_t i;
+        ge_p3 image_unp;
+        ge_dsmp image_pre;
+        crypto::ec_scalar sum, h;
+        const size_t pubs_count = pubs.size();
+        boost::shared_ptr<rs_comm> buf(reinterpret_cast<rs_comm *>(malloc(rs_comm_size(pubs_count))), free);
+        if (!buf)
+          abort();
+        assert(sec_index < pubs_count);
+    #if !defined(NDEBUG)
+        {
+          ge_p3 t;
+          crypto::public_key t2;
+          crypto::key_image t3;
+          assert(sc_check(&sec) == 0);
+          ge_scalarmult_base(&t, &sec);
+          ge_p3_tobytes(&t2, &t);
+          assert(*pubs[sec_index] == t2);
+          generate_key_image(*pubs[sec_index], sec, t3);
+          assert(image == t3);
+          for (i = 0; i < pubs_count; i++) {
+            assert(check_key(*pubs[i]));
+          }
+        }
+    #endif
+        if (ge_frombytes_vartime(&image_unp, kLRki.ki.bytes) != 0) {
+          abort();
+        }
+        ge_dsm_precomp(image_pre, &image_unp);
+        sc_0((unsigned char *)&sum);
+        buf->h = prefix_hash;
+        for (i = 0; i < pubs_count; i++) {
+          ge_p2 tmp2;
+          ge_p3 tmp3;
+          if (i == sec_index) {
+            buf->ab[i].a = (const ec_point &)kLRki.L;
+            buf->ab[i].b = (const ec_point &)kLRki.R;
+          } else {
+            sig[i].c = rct2sk(skGen());
+            sig[i].r = rct2sk(skGen());
+            if (ge_frombytes_vartime(&tmp3, (const unsigned char *)&*pubs[i]) != 0) {
+              abort();
+            }
+            ge_double_scalarmult_base_vartime(&tmp2, (const unsigned char *)&sig[i].c, &tmp3, (const unsigned char *)&sig[i].r);
+            ge_tobytes((unsigned char *)&buf->ab[i].a, &tmp2);
+            hash_to_ec(*pubs[i], tmp3);
+            ge_double_scalarmult_precomp_vartime(&tmp2, (const unsigned char *)&sig[i].r, &tmp3, (const unsigned char *)&sig[i].c, image_pre);
+            ge_tobytes((unsigned char *)&buf->ab[i].b, &tmp2);
+            sc_add((unsigned char *)&sum, (const unsigned char *)&sum, (const unsigned char *)&sig[i].c);
+          }
+        }
+        hash_to_scalar(buf.get(), rs_comm_size(pubs_count), h);
+        sc_sub((unsigned char *)&sig[sec_index].c, (const unsigned char *)&h, (const unsigned char *)&sum);
+        sc_mulsub((unsigned char *)&sig[sec_index].r, (const unsigned char *)&sig[sec_index].c, (const unsigned char *)&sec, kLRki.k.bytes);
+
+        msout.c[msout_idx] = (const rct::key&)sig[sec_index].c;
+    }
+
     //RingCT protocol
     //genRct: 
     //   creates an rctSig with all data necessary to verify the rangeProofs and that the signer owns one of the
@@ -1047,6 +1129,22 @@ namespace rct {
             rct::key diff;
             sc_mulsub(diff.bytes, msout.c[n].bytes, secret_key.bytes, k[n].bytes);
             sc_add(rv.p.MGs[n].ss[indices[n]][0].bytes, rv.p.MGs[n].ss[indices[n]][0].bytes, diff.bytes);
+        }
+        return true;
+    }
+
+    bool signMultisig(std::vector<std::vector<crypto::signature>> &signatures, const std::vector<unsigned int> &indices, const keyV &k, const multisig_out &msout, const key &secret_key) {
+        CHECK_AND_ASSERT_MES(indices.size() == k.size(), false, "Mismatched k/indices sizes");
+        CHECK_AND_ASSERT_MES(k.size() == signatures.size(), false, "Mismatched k/signatures size");
+        CHECK_AND_ASSERT_MES(k.size() == msout.c.size(), false, "Mismatched k/msout.c size");
+        for (size_t n = 0; n < indices.size(); ++n) {
+            CHECK_AND_ASSERT_MES(indices[n] < signatures[n].size(), false, "Index out of range");
+        }
+
+        for (size_t n = 0; n < indices.size(); ++n) {
+            rct::key diff;
+            sc_mulsub(diff.bytes, msout.c[n].bytes, secret_key.bytes, k[n].bytes);
+            sc_add((unsigned char*)&signatures[n][indices[n]].r, (const unsigned char*)&signatures[n][indices[n]].r, diff.bytes);
         }
         return true;
     }

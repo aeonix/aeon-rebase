@@ -40,6 +40,7 @@
 #include "common/util.h"
 
 #include "mnemonics/electrum-words.h"
+#include "mnemonics/english.h"
 #include <boost/format.hpp>
 #include <sstream>
 #include <unordered_map>
@@ -54,7 +55,6 @@ namespace Monero {
 
 namespace {
     // copy-pasted from simplewallet
-    static const size_t DEFAULT_MIXIN = 4;
     static const int    DEFAULT_REFRESH_INTERVAL_MILLIS = 1000 * 10;
     // limit maximum refresh interval as one minute
     static const int    MAX_REFRESH_INTERVAL_MILLIS = 1000 * 60 * 1;
@@ -588,6 +588,9 @@ bool WalletImpl::recover(const std::string &path, const std::string &seed)
         return false;
     }
 
+    if (old_language == crypto::ElectrumWords::old_language_name)
+        old_language = Language::English().get_language_name();
+
     try {
         m_wallet->set_seed_language(old_language);
         m_wallet->generate(path, "", recovery_key, true, false);
@@ -1043,7 +1046,7 @@ void WalletImpl::setSubaddressLabel(uint32_t accountIndex, uint32_t addressIndex
 //    - unconfirmed_transfer_details;
 //    - confirmed_transfer_details)
 
-PendingTransaction *WalletImpl::createTransaction(const string &dst_addr, const string &payment_id, optional<uint64_t> amount, uint32_t mixin_count,
+PendingTransaction *WalletImpl::createTransaction(const string &dst_addr, const string &payment_id, optional<uint64_t> amount, uint32_t ring_size,
                                                   PendingTransaction::Priority priority, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices)
 
 {
@@ -1055,9 +1058,11 @@ PendingTransaction *WalletImpl::createTransaction(const string &dst_addr, const 
 
     // indicates if dst_addr is integrated address (address + payment_id)
     // TODO:  (https://bitcointalk.org/index.php?topic=753252.msg9985441#msg9985441)
-    size_t fake_outs_count = mixin_count > 0 ? mixin_count : m_wallet->default_mixin();
-    if (fake_outs_count == 0)
-        fake_outs_count = DEFAULT_MIXIN;
+    if (ring_size == 0)
+        ring_size = m_wallet->default_ring_size();
+    if (ring_size == 0)
+        ring_size = DEFAULT_RING_SIZE;
+    size_t fake_outs_count = ring_size - 1;
 
     PendingTransactionImpl * transaction = new PendingTransactionImpl(*this);
 

@@ -88,7 +88,7 @@ namespace cryptonote
     in.height = height;
 
     uint64_t block_reward;
-    if(!get_block_reward(median_size, current_block_size, already_generated_coins, block_reward, hard_fork_version))
+    if(!get_block_reward(median_size, current_block_size, already_generated_coins, block_reward, hard_fork_version, height))
     {
       LOG_PRINT_L0("Block is too big");
       return false;
@@ -106,7 +106,7 @@ namespace cryptonote
     // from hard fork 4, we use a single "dusty" output. This makes the tx even smaller,
     // and avoids the quantization. These outputs will be added as rct outputs with identity
     // masks, to they can be used as rct inputs.
-    if (hard_fork_version >= 2 && hard_fork_version < 4) {
+    if (hard_fork_version >= 2 && hard_fork_version < HF_VERSION_ALLOW_RCT) {
       block_reward = block_reward - block_reward % ::config::BASE_REWARD_CLAMP_THRESHOLD;
     }
 
@@ -116,7 +116,7 @@ namespace cryptonote
       [&out_amounts](uint64_t a_dust) { out_amounts.push_back(a_dust); });
 
     CHECK_AND_ASSERT_MES(1 <= max_outs, false, "max_out must be non-zero");
-    if (height == 0 || hard_fork_version >= 4)
+    if (height == 0 || hard_fork_version >= HF_VERSION_ALLOW_RCT)
     {
       // the genesis block was not decomposed, for unknown reasons
       while (max_outs < out_amounts.size())
@@ -156,7 +156,7 @@ namespace cryptonote
 
     CHECK_AND_ASSERT_MES(summary_amounts == block_reward, false, "Failed to construct miner tx, summary_amounts = " << summary_amounts << " not equal block_reward = " << block_reward);
 
-    if (hard_fork_version >= 4)
+    if (hard_fork_version >= HF_VERSION_ALLOW_RCT)
       tx.version = 2;
     else
       tx.version = 1;
@@ -438,6 +438,11 @@ namespace cryptonote
       crypto::hash tx_prefix_hash;
       get_transaction_prefix_hash(tx, tx_prefix_hash);
 
+      if (msout)
+      {
+        msout->c.resize(sources.size());
+      }
+
       std::stringstream ss_ring_s;
       size_t i = 0;
       for(const tx_source_entry& src_entr:  sources)
@@ -458,7 +463,16 @@ namespace cryptonote
         std::vector<crypto::signature>& sigs = tx.signatures.back();
         sigs.resize(src_entr.outputs.size());
         if (!zero_secret_key)
-          crypto::generate_ring_signature(tx_prefix_hash, boost::get<txin_to_key>(tx.vin[i]).k_image, keys_ptrs, in_contexts[i].in_ephemeral.sec, src_entr.real_output, sigs.data());
+        {
+          if (msout)
+          {
+            rct::gen_prerct_multisig(tx_prefix_hash, keys_ptrs, in_contexts[i].in_ephemeral.sec, src_entr.real_output, src_entr.multisig_kLRki, *msout, i, sigs.data());
+          }
+          else
+          {
+            crypto::generate_ring_signature(tx_prefix_hash, boost::get<txin_to_key>(tx.vin[i]).k_image, keys_ptrs, in_contexts[i].in_ephemeral.sec, src_entr.real_output, sigs.data());
+          }
+        }
         ss_ring_s << "signatures:" << ENDL;
         std::for_each(sigs.begin(), sigs.end(), [&](const crypto::signature& s){ss_ring_s << s << ENDL;});
         ss_ring_s << "prefix_hash:" << tx_prefix_hash << ENDL << "in_ephemeral_key: " << in_contexts[i].in_ephemeral.sec << ENDL << "real_output: " << src_entr.real_output << ENDL;
@@ -622,17 +636,8 @@ namespace cryptonote
     //genesis block
     bl = boost::value_initialized<block>();
 
-
-    account_public_address ac = boost::value_initialized<account_public_address>();
-    std::vector<size_t> sz;
-    construct_miner_tx(0, 0, 0, 0, 0, ac, bl.miner_tx); // zero fee in genesis
-    blobdata txb = tx_to_blob(bl.miner_tx);
-    std::string hex_tx_represent = string_tools::buff_to_hex_nodelimer(txb);
-
-    std::string genesis_coinbase_tx_hex = config::GENESIS_TX;
-
     blobdata tx_bl;
-    bool r = string_tools::parse_hexstr_to_binbuff(genesis_coinbase_tx_hex, tx_bl);
+    bool r = string_tools::parse_hexstr_to_binbuff(genesis_tx, tx_bl);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");
     r = parse_and_validate_tx_from_blob(tx_bl, bl.miner_tx);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");

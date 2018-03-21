@@ -29,7 +29,7 @@
 set(crypto_sources
   aesb.c
   blake256.c
-  chacha8.c
+  chacha.c
   crypto-ops-data.c
   crypto-ops.c
   crypto.cpp
@@ -51,7 +51,7 @@ set(crypto_headers)
 
 set(crypto_private_headers
   blake256.h
-  chacha8.h
+  chacha.h
   crypto-ops.h
   crypto.h
   generic-ops.h
@@ -76,6 +76,7 @@ monero_add_library(cncrypto
   ${crypto_private_headers})
 target_link_libraries(cncrypto
   PUBLIC
+    epee
     ${Boost_SYSTEM_LIBRARY}
   PRIVATE
     ${EXTRA_LIBRARIES})
