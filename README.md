@@ -9,12 +9,6 @@ Portions Copyright (c) 2012-2018 The Cryptonote developers.
 - GitHub:  [https://github.com/aeonix/aeon-rebase](https://github.com/aeonix/aeon-rebase)
 - IRC: [#AEON on Freenode](http://webchat.freenode.net/?randomnick=1&channels=%23AEON&prompt=1&uio=d4)
 
-# Vulnerability response
-- Please direct vulnerabilities to the MONERO dev team via:
-
-- MONERO [Vulnerability Response Process](https://github.com/monero-project/meta/blob/master/VULNERABILITY_RESPONSE_PROCESS.md) encourages responsible disclosure
-- MONERO is also available via [HackerOne](https://hackerone.com/monero)
-
 # Introduction
 
 AEON is a private, secure, untraceable currency. You are your bank, you control your funds, and nobody can trace your transfers.
@@ -24,6 +18,36 @@ Privacy: AEON uses a cryptographically sound system to allow you to send and rec
 Security: Using the power of a distributed peer-to-peer consensus network, every transaction on the network is cryptographically secured. Individual wallets have a 24 word mnemonic that is only displayed once, and can be written down to backup the wallet. Wallet files are encrypted with a passphrase to ensure they are useless if stolen.
 
 Untraceability: By taking advantage of ring signatures, a special property of certain types of cryptography, AEON is able to ensure that transactions are not only untraceable, but have an optional measure of ambiguity that ensures that transactions cannot easily be tied back to an individual user or computer.
+
+# How is AEON different from Monero?
+
+Compared to our CryptoNote big brother, here are AEON's main advantages:
+
+1:
+Mobile-friendly
+
+1 MB scratchpad allows AEON to run efficiently on mobile devices alongside regular laptops and desktops.
+
+2:
+Different proof-of-work
+
+AEON's lightweight PoW (CryptoNote-Lite) allows for faster verification of the blockchain.
+
+3:
+Blockchain pruning for scalability
+
+Pruning allows the blockchain to stay small and not outgrow devices with limited storage. This feature also improves anonymity by reducing age-based attacks.
+
+4:
+Fast syncing
+
+Compared to Bitcoin variants, CryptoNote coins typically have higher verification, leading to more orphaned blocks. AEON helps this issue by using a 4-minute blocktime, reducing sync by a factor of four. Coupled with our lighter PoW, sync times on lower end devices can be improved by 10x or more.
+
+5:
+Optional lightweight transfers
+
+Overall, AEON seeks to be a lightweight-Monero, similar to how Litecoin seeks to be a lightweight-Bitcoin. While still drawing from the technical advantages of Monero and CryptoNote, AEON has distinct development goals and an independent community that enable it to thrive as its own currency
+
 
 # About this Project
 
@@ -42,7 +66,7 @@ AEON uses a cryptographically sound system to allow you to send and receive fund
 When running the daemon, take care to ensure that the console output is not blocked, as this may in turn cause processing threads to be blocked, potentially resulting in unreliable operation of the daemon. This can occur because the implementation contains many logging statements which send output to the console within the context of the processing thread, and if the output buffer fills up this will block the thread. The best practice is to start the daemon within the context of a background process manager such as screen or tmux, or within a terminal window on a physical or virtual console. In doing so be sure that the session is not left in 'scrollback' or 'edit' mode as this may eventualy cause the output to block.
 To ensure reliable performance (especially on mining/pool nodes where poor performance can result in increase 'orphan blocks'), ensure that the daemon is being run on hardware with sufficient memory to avoid excessive swapping and long pauses. While it is possible to operate with limited memory and swap in some cases (though not recommended for mining), this requires care and a platform with sufficient I/O performance (e.g. unthrottled SSD). In the latter case also see the next item.
 One cause of high resource usage and long processing delays is the periodic saving of the blockchain every 12 hours. Doing so requires access to the entire memory space and potentially large amounts of swapping. It can be disabled using the --disable-save option. The blockchain will still be saved on exit or upon request using the save command.
-If using the rpc wallet (simplewallet --rpc-bind-port), access to the wallet RPC port will allow sending funds from the wallet. By default the rpc port is bound to the loopback interface so access is only possible from the same system. You are responsible for appropriately controlling/limiting access to the port (eg. using virtualization, firewall settings, etc.) to prevent loss of funds. If not using the --rpc-bind-port the wallet does not accept remote commands and this issue does not apply.
+If using the rpc wallet (aeon-wallet-cli.exe --rpc-bind-port), access to the wallet RPC port will allow sending funds from the wallet. By default the rpc port is bound to the loopback interface so access is only possible from the same system. You are responsible for appropriately controlling/limiting access to the port (eg. using virtualization, firewall settings, etc.) to prevent loss of funds. If not using the --rpc-bind-port the wallet does not accept remote commands and this issue does not apply.
 
 # Security
 
@@ -59,6 +83,12 @@ If you have a fix or code change, feel free to submit it as a pull request direc
 # Supporting the project
 
 AEON is a 100% community-sponsored endeavor. If you want to join our efforts, the easiest thing you can do is support the project financially. Both AEON and Bitcoin donations can be made to the DEV fund donation address via the `donate` command (type `help` in the command-line wallet for details).
+
+# Vulnerability response
+- Please direct vulnerabilities to the MONERO dev team via:
+
+- MONERO [Vulnerability Response Process](https://github.com/monero-project/meta/blob/master/VULNERABILITY_RESPONSE_PROCESS.md) encourages responsible disclosure
+- MONERO is also available via [HackerOne](https://hackerone.com/monero)
 
 # License
 
