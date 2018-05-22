@@ -179,30 +179,44 @@ Build wallet: brew install --HEAD aeon
 
 # On Windows:
 
-Dependencies: MSVC 2013 or later, CMake 2.8.6 or later, and Boost 1.53 or later.
+Binaries for Windows are built on Windows using the MinGW toolchain within MSYS2 environment. The MSYS2 environment emulates a POSIX system. The toolchain runs within the environment and cross-compiles binaries that can run outside of the environment as a regular Windows application.
 
-To build, change to the root of the source code directory, and run these commands:
+Preparing the build environment
 
-mkdir build cd build cmake -G "Visual Studio 12 Win64" -DBOOST_ROOT="c:\folder\to\boost_1_55_0" -DBOOST_LIBRARYDIR="c:\folder\to\boost_1_55_0\lib64-msvc-12.0" msbuild Project.sln /p:Configuration=Release
+Download and install the MSYS2 installer, either the 64-bit or the 32-bit package, depending on your system.
 
-If you don't have your path environment variable configured with the VS paths, you may may want to run 'C:\program files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat' (or equivalent) to temporarily set the environment variables.
+Open the MSYS shell via the MSYS2 Shell shortcut
 
-Please note that if using a newer version of MSVC please subsitute -G "Visual Studio 12 Win64" and subsequent file paths with correct version for proper compiling.
+Update packages using pacman:
 
-Building Documentation
+  pacman -Syuu  
+Exit the MSYS shell using Alt+F4
 
-AEON developer documentation uses Doxygen, and is currently a work-in-progress.
+Edit the properties for the MSYS2 Shell shortcut changing "msys2_shell.bat" to "msys2_shell.cmd -mingw64" for 64-bit builds or "msys2_shell.cmd -mingw32" for 32-bit builds
 
-Dependencies: Doxygen 1.8.0 or later, Graphviz 2.28 or later (optional)
+Restart MSYS shell via modified shortcut and update packages again using pacman:
 
-To build, change to the root of the source code directory, and run 'doxygen Doxyfile'
+  pacman -Syuu  
+Install dependencies:
 
-If you have installed Graphviz, you can also generate in-doc diagrams by instead running 'HAVE_DOT=YES doxygen Doxyfile'
+To build for 64-bit Windows:
 
-The output will be built in doc/html/
+  pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium
+To build for 32-bit Windows:
 
-[^] On Debian/Ubuntu `libgtest-dev` only includes sources and headers. You must
-build the library binary manually. This can be done with the following command ```sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/ ```
+  pacman -S mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost mingw-w64-i686-openssl mingw-w64-i686-zeromq mingw-w64-i686-libsodium
+Open the MingW shell via MinGW-w64-Win64 Shell shortcut on 64-bit Windows or MinGW-w64-Win64 Shell shortcut on 32-bit Windows. Note that if you are running 64-bit Windows, you will have both 64-bit and 32-bit MinGW shells.
+
+Building
+
+If you are on a 64-bit system, run:
+
+  make release-static-win64
+If you are on a 32-bit system, run:
+
+  make release-static-win32
+
+The resulting executables can be found in build/release/bin
 
 
 # LMDB
