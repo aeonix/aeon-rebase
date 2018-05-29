@@ -258,7 +258,9 @@ https://github.com/aeonix/aeon/tree/v0.12.0.0#dependencies
 Run these commands:
 
 git clone --recursive https://github.com/aeonix/aeon.git aeon_sophia 
+
 cd aeon_sophia
+
 make release
 
 
