@@ -122,29 +122,60 @@ library archives (`.a`).
 
 # Compiling AEON
 
-On Unix and Linux:
+[^] On Debian/Ubuntu libgtest-dev only includes sources and headers. You must build the library binary manually. This can be done with the following command sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/
 
-Dependencies: GCC 4.7.3 or later, CMake 2.8.6 or later, and Boost 1.53 or later (except 1.54, more details here: http://goo.gl/RrCFmA).
+Cloning the repository
 
-To build, change to the root of the source code directory, and run 'make'.
+Clone recursively to pull-in needed submodule(s):
 
-The resulting executables can be found in build/release/src.
+$ git clone --recursive https://github.com/aeonix/aeon
 
-Advanced options:
+If you already have a repo cloned, initialize and update:
 
-Parallel build: run 'make -j' instead of 'make'.
+$ cd monero && git submodule init && git submodule update
 
-Debug build: run 'make build-debug'.
+Build instructions
 
-Test suite: run 'make test-release' to run tests in addition to building. Running 'make test-debug' will do the same to the debug version.
+Aeon uses the CMake build system and a top-level Makefile that invokes cmake commands as needed.
 
-Building with Clang: it may be possible to use Clang instead of GCC, but this may not work everywhere. To build, run 'export CC=clang CXX=clang++' before running 'make'.
+On Linux and OS X
 
-Manual Cmake: If you wish to manually invoke cmake separately instead of the above make, you will need to use the following: mkdir -p build/release && cd build/release && cmake -D CMAKE_BUILD_TYPE=Release ../.. && make. Other options can be used for debug or test builds. See root Makefile in the repo.
+Install the dependencies
 
+Change to the root of the source code directory and build:
+
+  cd aeon
+  make
+Optional: If your machine has several cores and enough memory, enable parallel build by running make -j<number of threads> instead of make. For this to be worthwhile, the machine should have one core and about 2GB of RAM available per thread.
+
+Note: If cmake can not find zmq.hpp file on OS X, installing zmq.hpp from https://github.com/zeromq/cppzmq to /usr/local/include should fix that error.
+
+The resulting executables can be found in build/release/bin
+
+Add PATH="$PATH:$HOME/aeon/build/release/bin" to .profile
+
+Run Monero with aeond --detach
+
+Optional: build and run the test suite to verify the binaries:
+
+  make release-test
+NOTE: core_tests test may take a few hours to complete.
+
+Optional: to build binaries suitable for debugging:
+
+   make debug
+Optional: to build statically-linked binaries:
+
+   make release-static
+Dependencies need to be built with -fPIC. Static libraries usually aren't, so you may have to build them yourself with -fPIC. Refer to their documentation for how to build them.
+
+Optional: build documentation in doc/html (omit HAVE_DOT=YES if graphviz is not installed):
+
+  HAVE_DOT=YES doxygen Doxyfile
+  
 # On OS X:
 
-Successful Build with Cmake on High Sierra requires the following:
+Successful Build on High Sierra requires the following:
 
 1-Install osx Command Line Tools;
 Copy paste in terminal: xcode-select --install
@@ -217,6 +248,18 @@ If you are on a 32-bit system, run:
   make release-static-win32
 
 The resulting executables can be found in build/release/bin
+
+# Ubuntu 16.04
+
+Check for dependencies: 
+
+https://github.com/aeonix/aeon/tree/v0.12.0.0#dependencies
+
+Run these commands:
+
+git clone --recursive https://github.com/aeonix/aeon.git aeon_sophia 
+cd aeon_sophia
+make release
 
 
 # LMDB
