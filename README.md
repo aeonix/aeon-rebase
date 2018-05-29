@@ -128,50 +128,79 @@ Cloning the repository
 
 Clone recursively to pull-in needed submodule(s):
 
+```
 $ git clone --recursive https://github.com/aeonix/aeon
+```
 
 If you already have a repo cloned, initialize and update:
 
-$ cd monero && git submodule init && git submodule update
+```
+$ cd aeon && git submodule init && git submodule update
+```
 
 Build instructions
 
 Aeon uses the CMake build system and a top-level Makefile that invokes cmake commands as needed.
 
-On Linux and OS X
+- On Linux and OS X
 
 Install the dependencies
 
 Change to the root of the source code directory and build:
 
+  ```
   cd aeon
+  ```
+  
+  ```
   make
+  ```
+  
 Optional: If your machine has several cores and enough memory, enable parallel build by running make -j<number of threads> instead of make. For this to be worthwhile, the machine should have one core and about 2GB of RAM available per thread.
-
+  
+  ```
+  cd aeon
+  ```
+  
+  ```
+  make -j 2
+  ```
+  
 Note: If cmake can not find zmq.hpp file on OS X, installing zmq.hpp from https://github.com/zeromq/cppzmq to /usr/local/include should fix that error.
 
 The resulting executables can be found in build/release/bin
 
+```
 Add PATH="$PATH:$HOME/aeon/build/release/bin" to .profile
-
-Run Monero with aeond --detach
+```
 
 Optional: build and run the test suite to verify the binaries:
 
+  ```
   make release-test
+  ```
+  
 NOTE: core_tests test may take a few hours to complete.
 
 Optional: to build binaries suitable for debugging:
 
+   ```
    make debug
+   ```
+   
 Optional: to build statically-linked binaries:
 
+   ```
    make release-static
+   ```
+   
 Dependencies need to be built with -fPIC. Static libraries usually aren't, so you may have to build them yourself with -fPIC. Refer to their documentation for how to build them.
 
 Optional: build documentation in doc/html (omit HAVE_DOT=YES if graphviz is not installed):
 
+  ```
   HAVE_DOT=YES doxygen Doxyfile
+  ```
   
 # On OS X:
 
@@ -185,15 +214,20 @@ Home-brew installed (https://brew.sh)
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 then run the following to install dependencies using Homebrew:
+```
 Brew install wget
 Brew install openssl
 Brew install pkg-config
 Brew install zeromq
+```
 
 Note: If cmake can not find zmq.hpp file on OS X, installing zmq.hpp from https://github.com/zeromq/cppzmq to /usr/local/include should fix that error.
 
 After everything is installed CD to the folder the build package is in and run:
-make -2
+
+```
+make -j 2
+```
 
 The resulting executables can be found in build/release/bin
 
@@ -205,7 +239,11 @@ Ensure Homebrew is installed, it can be found at http://brew.sh
 
 Add the repository: brew tap sammy007/cryptonight
 
-Build wallet: brew install --HEAD aeon
+Build wallet: 
+
+```
+brew install --HEAD aeon
+```
 
 
 # On Windows:
@@ -257,11 +295,17 @@ https://github.com/aeonix/aeon/tree/v0.12.0.0#dependencies
 
 Run these commands:
 
+```
 git clone --recursive https://github.com/aeonix/aeon.git aeon_sophia 
+```
 
+```
 cd aeon_sophia
+```
 
+```
 make release
+```
 
 
 # LMDB
