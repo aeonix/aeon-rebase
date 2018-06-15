@@ -158,9 +158,9 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0xB2;                // starts with "Wm"
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x2733;   // starts with "Wz"
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x06B8;           // starts with "Xn"
-  uint16_t const P2P_DEFAULT_PORT = 11180;
-  uint16_t const RPC_DEFAULT_PORT = 11181;
-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 11182;
+  uint16_t const P2P_DEFAULT_PORT = 11000;
+  uint16_t const RPC_DEFAULT_PORT = 11001;
+  uint16_t const ZMQ_RPC_DEFAULT_PORT = 11002;
   boost::uuids::uuid const NETWORK_ID = { {
       0x32 ,0x32, 0xF3, 0x91 , 0x81, 0x18 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
     } }; // Bender's nightmare
@@ -172,9 +172,9 @@ namespace config
     uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x0426;              // starts with "Um"
     uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x2C27;   // starts with "Uz"
     uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x0AAC;           // starts with "Vn"
-    uint16_t const P2P_DEFAULT_PORT = 21180;
-    uint16_t const RPC_DEFAULT_PORT = 21181;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 21182;
+    uint16_t const P2P_DEFAULT_PORT = 11100;
+    uint16_t const RPC_DEFAULT_PORT = 11101;
+    uint16_t const ZMQ_RPC_DEFAULT_PORT = 11102;
     boost::uuids::uuid const NETWORK_ID = { {
         0x32 ,0x32, 0xF3, 0x91 , 0x81, 0x18 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x11
       } }; // Bender's daydream
@@ -187,9 +187,9 @@ namespace config
     uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x011A;              // starts with "Sm"
     uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x2C1B;   // starts with "Sz"
     uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x0B20;           // starts with "Tn"
-    uint16_t const P2P_DEFAULT_PORT = 31180;
-    uint16_t const RPC_DEFAULT_PORT = 31181;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 31182;
+    uint16_t const P2P_DEFAULT_PORT = 11110;
+    uint16_t const RPC_DEFAULT_PORT = 11111;
+    uint16_t const ZMQ_RPC_DEFAULT_PORT = 11112;
     boost::uuids::uuid const NETWORK_ID = { {
         0x32 ,0x32, 0xF3, 0x91 , 0x81, 0x18 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x12
       } }; // Bender's daydream
