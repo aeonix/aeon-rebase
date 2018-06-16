@@ -380,6 +380,8 @@ namespace nodetool
     else
     {
       full_addrs.insert("54.37.159.163:11000");
+      full_addrs.insert("54.37.159.163:12000");
+      full_addrs.insert("54.37.159.163:13000");
   
     }
     return full_addrs;
