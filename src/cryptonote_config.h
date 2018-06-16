@@ -35,7 +35,7 @@
 
 #define CRYPTONOTE_DNS_TIMEOUT_MS                       20000
 
-#define HARDFORK_1_HEIGHT                               592000
+#define HARDFORK_1_HEIGHT                               1
 #define HARDFORK_1_POW_SPEED_MULTIPLIER                 2
 #define HARDFORK_1_DIFFADJ                              HARDFORK_1_POW_SPEED_MULTIPLIER
 #define HARDFORK_1_DIFFADJ_WINDOW                       360
