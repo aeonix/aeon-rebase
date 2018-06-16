@@ -141,7 +141,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
 endif()
 
 if(PER_BLOCK_CHECKPOINT)
-  add_subdirectory(blocks)
+  # add_subdirectory(blocks)
 endif()
 
 add_subdirectory(device)
