@@ -58,7 +58,7 @@
 
 #define NET_MAKE_IP(b1,b2,b3,b4)  ((LPARAM)(((DWORD)(b1)<<24)+((DWORD)(b2)<<16)+((DWORD)(b3)<<8)+((DWORD)(b4))))
 
-#define MIN_WANTED_SEED_NODES 2
+#define MIN_WANTED_SEED_NODES 6
 
 namespace nodetool
 {
