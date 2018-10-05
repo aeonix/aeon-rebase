@@ -747,7 +747,7 @@ int main(int argc, char* argv[])
       "*****************************************************************************************\n"
       "You have 90 seconds to press ^C or terminate this program before unverified import starts\n"
       "*****************************************************************************************");
-    sleep(90);
+    Sleep(90);
   }
 
   cryptonote::cryptonote_protocol_stub pr; //TODO: stub only for this kind of test, make real validation of relayed objects
