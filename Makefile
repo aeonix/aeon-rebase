@@ -28,6 +28,14 @@
 
 all: release-all
 
+install:
+	install -d build/release/bin/aeond /usr/local/bin
+	install -d build/release/bin/aeon-blockchain-export /usr/local/bin
+	install -d build/release/bin/aeon-blockchain-import /usr/local/bin
+	install -d build/release/bin/aeon-blockchain-usage /usr/local/bin
+	install -d build/release/bin/aeon-wallet-rpc /usr/local/bin
+	install -d build/release/bin/aeon-wallet-cli /usr/local/bin
+
 cmake-debug:
 	mkdir -p build/debug
 	cd build/debug && cmake -D CMAKE_BUILD_TYPE=Debug ../..
