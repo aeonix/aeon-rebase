@@ -1,5 +1,19 @@
 # Aeon
 
+[![Github All Releases](https://img.shields.io/github/downloads/aeonix/aeon/total.svg)](../../releases)
+[![GitHub release](https://img.shields.io/github/release/aeonix/aeon/all.svg)](../../releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date-pre/aeonix/aeon.svg)](../../releases/latest)
+[![GitHub top language](https://img.shields.io/github/languages/top/aeonix/aeon.svg)](../../)
+[![GitHub language count](https://img.shields.io/github/languages/count/aeonix/aeon.svg)](../../)
+[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/aeonix/aeon.svg)](../../)
+
+[![GitHub last commit](https://img.shields.io/github/last-commit/aeonix/aeon.svg)](../../)
+[![Github commits (since latest release)](https://img.shields.io/github/commits-since/aeonix/aeon/latest.svg)](../../)
+[![GitHub stars](https://img.shields.io/github/stars/aeonix/aeon.svg)](../../stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/aeonix/aeon.svg)](../../network)
+[![GitHub issues](https://img.shields.io/github/issues/aeonix/aeon.svg)](../../issues)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/aeonix/aeon.svg)](../../issues)
+
 Copyright (c) 2014-2018, AEON, The Monero Project.   
 Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
@@ -10,6 +24,7 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 - Reddit: https://www.reddit.com/r/Aeon
 - GitHub: [https://github.com/aeonix/aeon](https://github.com/aeonix/aeon)
 - IRC: [#aeon on Freenode](http://webchat.freenode.net/?randomnick=1&channels=%23aeon&prompt=1&uio=d4)
+- Discord: https://discord.gg/TM8mEsx
 
 ## Vulnerability response
 
@@ -79,7 +94,7 @@ Dates are provided in the format YYYY-MM-DD.
 | Software upgrade block height | Date       | Fork version | Minimum Aeon version | Recommended Aeon version | Details                                                                            |  
 | ------------------------------ | -----------| ----------------- | ---------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
 | 592000                        | 2015-08-04 | v1 (exceptional, version not bumped)      | v0.9.0.0                 | v0.9.14.0                     | blocktime = 240 seconds, CryptoNight-Lite, lower mining priority for ringsize < 3       |
-| 963500                        | 2018-06-03 | v7                | v0.12.0.0                 | v0.12.2.1                    | Rebase to Monero's latest codebase with RingCT disabled, CryptoNight-Lite variant 1, limited use of ringsize 1, ban ringsize 2   |
+| 963500                        | 2018-06-03 | v7                | v0.12.0.0                 | v0.12.6.0-aeon                    | Rebase to Monero's latest codebase with RingCT disabled, CryptoNight-Lite variant 1, limited use of ringsize 1, ban ringsize 2   |
 
 ## Compiling Aeon from source
 
@@ -142,7 +157,7 @@ invokes cmake commands as needed.
 * Change to the root of the source code directory, change to the most recent release tag, and build:
 
         cd aeon
-        git checkout v0.12.2.1
+        git checkout v0.12.6.0-aeon
         make
 
     *Optional*: If your machine has several cores and enough memory, enable
@@ -204,7 +219,7 @@ Tested on a Raspberry Pi Zero with a clean install of minimal Raspbian Stretch (
 ```
         git clone https://github.com/aeonix/aeon.git
 	cd aeon
-	git checkout tags/v0.12.2.1
+	git checkout tags/v0.12.6.0-aeon
 ```
 * Build:
 ```
@@ -301,9 +316,9 @@ application.
 	
         cd aeon
 
-* If you would like a specific [version/tag](https://github.com/aeonix/aeon/tags), do a git checkout for that version. eg. 'v0.12.1.0'. If you dont care about the version and just want binaries from master, skip this step:
+* If you would like a specific [version/tag](https://github.com/aeonix/aeon/tags), do a git checkout for that version. eg. 'v0.12.6.0-aeon'. If you dont care about the version and just want binaries from master, skip this step:
 	
-        git checkout v0.12.1.0
+        git checkout v0.12.6.0-aeon
 
 * If you are on a 64-bit system, run:
 
@@ -566,7 +581,7 @@ TAILS ships with a very restrictive set of firewall rules. Therefore, you need
 to add a rule to allow this connection too, in addition to telling torsocks to
 allow inbound connections. Full example:
 
-    sudo iptables -I OUTPUT 2 -p tcp -d 127.0.0.1 -m tcp --dport 18081 -j ACCEPT
+    sudo iptables -I OUTPUT 2 -p tcp -d 127.0.0.1 -m tcp --dport 11181 -j ACCEPT
     DNS_PUBLIC=tcp torsocks ./aeond --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 \
         --data-dir /home/amnesia/Persistent/your/directory/to/the/blockchain
 
