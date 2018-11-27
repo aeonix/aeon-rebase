@@ -157,7 +157,7 @@ invokes cmake commands as needed.
 * Change to the root of the source code directory, change to the most recent release tag, and build:
 
         cd aeon
-        git checkout v0.12.6.0-aeon
+        git checkout v0.12.7.0-aeon
         make
 
     *Optional*: If your machine has several cores and enough memory, enable
@@ -219,7 +219,7 @@ Tested on a Raspberry Pi Zero with a clean install of minimal Raspbian Stretch (
 ```
         git clone https://github.com/aeonix/aeon.git
 	cd aeon
-	git checkout tags/v0.12.6.0-aeon
+	git checkout tags/v0.12.7.0-aeon
 ```
 * Build:
 ```
@@ -318,7 +318,7 @@ application.
 
 * If you would like a specific [version/tag](https://github.com/aeonix/aeon/tags), do a git checkout for that version. eg. 'v0.12.6.0-aeon'. If you dont care about the version and just want binaries from master, skip this step:
 	
-        git checkout v0.12.6.0-aeon
+        git checkout v0.12.7.0-aeon
 
 * If you are on a 64-bit system, run:
 
