@@ -453,19 +453,19 @@ Then you can run make as usual.
 
         # Build image for ARM 32-bit (select android32.Dockerfile)
         
-        ```cd utils/build_scripts/ && docker build -f android32.Dockerfile -t aeon-android . ```
+        cd utils/build_scripts/ && docker build -f android32.Dockerfile -t aeon-android .
         
         # Build image for ARM 64-bit (select android64.Dockerfile for aarch64)
         
-        ```cd utils/build_scripts/ && docker build -f android64.Dockerfile -t aeon-android . ```
+        cd utils/build_scripts/ && docker build -f android64.Dockerfile -t aeon-android . 
         
         # Create container
-        
-        ```docker create -it --name aeon-android aeon-android bash```
+       
+        docker create -it --name aeon-android aeon-android bash
         
         # Get binaries
         
-        ```docker cp aeon-android:/opt/android/aeon/build/release/bin . ```
+        docker cp aeon-android:/opt/android/aeon/build/release/bin . 
 
 ### Building portable statically linked binaries
 
