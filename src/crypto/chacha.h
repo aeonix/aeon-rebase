@@ -1,4 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2019, The TurtleCoin Developers
 // 
 // All rights reserved.
 // 
@@ -72,14 +73,14 @@ namespace crypto {
   inline void generate_chacha_key(const void *data, size_t size, chacha_key& key) {
     static_assert(sizeof(chacha_key) <= sizeof(hash), "Size of hash must be at least that of chacha_key");
     tools::scrubbed_arr<char, HASH_SIZE> pwd_hash;
-    crypto::cn_slow_hash(data, size, pwd_hash.data(), 0/*light*/, 0/*variant*/, 0/*prehashed*/);
+    cn_slow_hash(data, size, reinterpret_cast<char *>(pwd_hash.data()), 0, 0, 0, CN_PAGE_SIZE, CN_SCRATCHPAD, CN_ITERATIONS);
     memcpy(&unwrap(key), pwd_hash.data(), sizeof(key));
   }
 
   inline void generate_chacha_key_prehashed(const void *data, size_t size, chacha_key& key) {
     static_assert(sizeof(chacha_key) <= sizeof(hash), "Size of hash must be at least that of chacha_key");
     tools::scrubbed_arr<char, HASH_SIZE> pwd_hash;
-    crypto::cn_slow_hash(data, size, pwd_hash.data(), 0/*light*/, 0/*variant*/, 1/*prehashed*/);
+    cn_slow_hash(data, size, reinterpret_cast<char *>(pwd_hash.data()), 0, 0, 1, CN_PAGE_SIZE, CN_SCRATCHPAD, CN_ITERATIONS);
     memcpy(&unwrap(key), pwd_hash.data(), sizeof(key));
   }
 

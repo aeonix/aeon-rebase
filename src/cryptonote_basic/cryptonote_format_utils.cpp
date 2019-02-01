@@ -1,4 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2019, The TurtleCoin Developers
 // 
 // All rights reserved.
 // 
@@ -987,8 +988,20 @@ namespace cryptonote
   bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
   {
     blobdata bd = get_block_hashing_blob(b);
-    const int cn_variant = b.major_version >= 7 ? b.major_version - 6 : 0;
-    crypto::cn_slow_hash(bd.data(), bd.size(), res, height >= HARDFORK_1_HEIGHT || b.major_version >= 2, cn_variant);
+
+    if (b.major_version >= 8)
+    {
+        cn_turtle_lite_slow_hash_v2(bd.data(), bd.size(), res);
+    }
+    else if (b.major_version >= 7)
+    {
+        cn_lite_slow_hash_v1(bd.data(), bd.size(), res);
+    }
+    else
+    {
+        cn_lite_slow_hash_v0(bd.data(), bd.size(), res);
+    }
+
     return true;
   }
   //---------------------------------------------------------------
@@ -1093,7 +1106,7 @@ namespace cryptonote
   crypto::secret_key encrypt_key(crypto::secret_key key, const epee::wipeable_string &passphrase)
   {
     crypto::hash hash;
-    crypto::cn_slow_hash(passphrase.data(), passphrase.size(), hash);
+    cn_slow_hash_v0(passphrase.data(), passphrase.size(), hash);
     sc_add((unsigned char*)key.data, (const unsigned char*)key.data, (const unsigned char*)hash.data);
     return key;
   }
@@ -1101,7 +1114,7 @@ namespace cryptonote
   crypto::secret_key decrypt_key(crypto::secret_key key, const epee::wipeable_string &passphrase)
   {
     crypto::hash hash;
-    crypto::cn_slow_hash(passphrase.data(), passphrase.size(), hash);
+    cn_slow_hash_v0(passphrase.data(), passphrase.size(), hash);
     sc_sub((unsigned char*)key.data, (const unsigned char*)key.data, (const unsigned char*)hash.data);
     return key;
   }

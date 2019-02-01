@@ -864,7 +864,7 @@ bool wallet2::get_multisig_seed(std::string& seed, const epee::wipeable_string &
   if (!passphrase.empty())
   {
     crypto::secret_key key;
-    crypto::cn_slow_hash(passphrase.data(), passphrase.size(), (crypto::hash&)key);
+    crypto::cn_slow_hash_v0(passphrase.data(), passphrase.size(), (crypto::hash&)key);
     sc_reduce32((unsigned char*)key.data);
     data = encrypt(data, key, true);
   }
