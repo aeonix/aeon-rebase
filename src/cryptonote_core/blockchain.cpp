@@ -98,7 +98,7 @@ static const struct {
   { 7, 963500, 0, 1527137212, 2000000000 },
 
   // version 8 starts from block 1077777, which is on or around the 17th of April, 2019.
-  { 8, 1077777, 0, 1555459815, 8000000000 },
+  { 8, 1077777, 0, 1555459815, 1000000000 },
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 963499;
 
