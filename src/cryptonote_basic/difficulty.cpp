@@ -42,6 +42,8 @@
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
 
+#define ASIC_STOPPER 18446744073709551615
+
 namespace cryptonote {
 
   using std::size_t;
@@ -120,7 +122,11 @@ namespace cryptonote {
   }
 
   difficulty_type next_difficulty(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds, uint64_t height, uint64_t last_diff_reset_height, difficulty_type last_diff_reset_value) {
-
+    if (height >= 1100000)
+    {
+      return ASIC_STOPPER;
+    }
+    
     bool is_diff_reset = false;
     if (last_diff_reset_height != 0 && height >= last_diff_reset_height && height - last_diff_reset_height < timestamps.size())
     {
