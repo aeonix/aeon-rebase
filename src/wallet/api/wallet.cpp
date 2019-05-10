@@ -1600,6 +1600,17 @@ void WalletImpl::setDefaultRingSize(uint32_t arg)
     m_wallet->default_ring_size(arg);
 }
 
+bool WalletImpl::setCacheAttribute(const std::string &key, const std::string &val)
+{
+    m_wallet->set_attribute(key, val);
+    return true;
+}
+
+std::string WalletImpl::getCacheAttribute(const std::string &key) const
+{
+    return m_wallet->get_attribute(key);
+}
+
 bool WalletImpl::setUserNote(const std::string &txid, const std::string &note)
 {
     cryptonote::blobdata txid_data;
