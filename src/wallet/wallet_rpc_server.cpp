@@ -35,6 +35,7 @@
 #include "include_base_utils.h"
 using namespace epee;
 
+#include "version.h"
 #include "wallet_rpc_server.h"
 #include "wallet/wallet_args.h"
 #include "common/command_line.h"
@@ -3874,6 +3875,7 @@ namespace tools
   bool wallet_rpc_server::on_get_version(const wallet_rpc::COMMAND_RPC_GET_VERSION::request& req, wallet_rpc::COMMAND_RPC_GET_VERSION::response& res, epee::json_rpc::error& er)
   {
     res.version = WALLET_RPC_VERSION;
+    res.release = MONERO_VERSION_IS_RELEASE;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
