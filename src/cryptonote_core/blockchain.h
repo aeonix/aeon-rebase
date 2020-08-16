@@ -30,6 +30,13 @@
 
 #pragma once
 #include <boost/asio/io_service.hpp>
+<<<<<<< HEAD
+=======
+#include <boost/function/function_fwd.hpp>
+#if BOOST_VERSION >= 107400
+#include <boost/serialization/library_version_type.hpp>
+#endif
+>>>>>>> 07442a605 (Fix build with Boost 1.74)
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/list.hpp>
