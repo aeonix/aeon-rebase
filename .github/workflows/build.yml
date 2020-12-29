@@ -10,7 +10,7 @@ jobs:
       with:
         submodules: recursive
     - name: update brew and install dependencies
-      run: brew update && brew install boost zmq libpgm miniupnpc ldns expat libunwind-headers protobuf
+      run: brew update && brew link --overwrite python && brew install boost zmq libpgm miniupnpc ldns expat libunwind-headers protobuf
     - name: fetch zmq.hpp
       run: brew tap osrf/simulation && brew install cppzmq
     - name: build
