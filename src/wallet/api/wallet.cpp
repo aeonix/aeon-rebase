@@ -1316,7 +1316,7 @@ PendingTransaction* WalletImpl::restoreMultisigTransaction(const string& signDat
 //    - confirmed_transfer_details)
 
 PendingTransaction *WalletImpl::createTransaction(const string &dst_addr, const string &payment_id, optional<uint64_t> amount, uint32_t ring_size,
-                                                  PendingTransaction::Priority priority_enum, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices)
+                                                  uint32_t priority, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices)
 
 {
     clearStatus();
@@ -1331,7 +1331,6 @@ PendingTransaction *WalletImpl::createTransaction(const string &dst_addr, const 
         ring_size = m_wallet->default_ring_size();
     ring_size = m_wallet->adjust_ring_size(ring_size);
 
-    uint32_t priority = static_cast<uint32_t>(priority_enum);
     if (ring_size != 1)
       priority = m_wallet->adjust_priority(priority);
 
