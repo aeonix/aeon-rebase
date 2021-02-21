@@ -75,15 +75,7 @@ struct PendingTransaction
         Status_Error,
         Status_Critical
     };
-
-    enum Priority {
-        Priority_Default = 0,
-        Priority_Low = 1,
-        Priority_Medium = 2,
-        Priority_High = 3,
-        Priority_Last
-    };
-
+    
     virtual ~PendingTransaction() = 0;
     virtual int status() const = 0;
     virtual std::string errorString() const = 0;
@@ -757,7 +749,7 @@ struct Wallet
 
     virtual PendingTransaction * createTransaction(const std::string &dst_addr, const std::string &payment_id,
                                                    optional<uint64_t> amount, uint32_t ring_size,
-                                                   PendingTransaction::Priority = PendingTransaction::Priority_Low,
+                                                   uint32_t priority,
                                                    uint32_t subaddr_account = 0,
                                                    std::set<uint32_t> subaddr_indices = {}) = 0;
 
