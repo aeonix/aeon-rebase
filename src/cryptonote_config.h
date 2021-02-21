@@ -71,7 +71,7 @@
 #define DEFAULT_FEE_V1                                  ((uint64_t)10000000000) // pow(10, 10)
 
 #define FEE_PER_KB                                      ((uint64_t)1000000000) // 1 * pow(10, 9)
-#define FEE_PER_KB_v10                                      ((uint64_t)1024) // 1 * pow(10, 9)
+#define FEE_PER_KB_v10                                      ((uint64_t)1024) // 1 atomic unit = 1 byte
 
 #define ORPHANED_BLOCKS_MAX_COUNT                       100
 
