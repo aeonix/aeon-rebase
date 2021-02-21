@@ -104,8 +104,9 @@ static const struct {
 
   // version 9 (difficulty algorithm variant 9) starts from block 1280000 (with no diff reset) which is on or around the 11th of November, 2020
   { 9, 1280000, 0, 1601281605, 0 },
-  // version 9 (difficulty algorithm variant 9) starts from block 1280000 (with no diff reset) which is on or around the 11th of November, 2020
-  { 10, 1280000, 0, 1660885200, 0 },
+	
+  // version 10 set max supply to 2^64 starting at tailemission beginning
+  { 10, 1511770, 0, 1660885200, 0 },
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 963499;
 
@@ -128,7 +129,8 @@ static const struct {
 
   // version 9 (difficulty algorithm variant 9) starts from block 131111 with no diff reset
   { 9, 131111, 0, 1600148906, 0 },
-  // version 9 (difficulty algorithm variant 9) starts from block 131111 with no diff reset
+	
+  // version 10 set max supply to 2^64 starting at tailemission beginning
   { 10, 160048, 0, 1660885200, 0 },
 };
 static const uint64_t testnet_hard_fork_version_1_till = 43999;
@@ -152,7 +154,8 @@ static const struct {
 
   // version 9 (difficulty algorithm variant 9) starts from block 261800 with no diff reset
   { 9, 261800, 0, 1601281605, 0 },
-  // version 9 (difficulty algorithm variant 9) starts from block 261800 with no diff reset
+	
+  // version 10 set max supply to 2^64 starting at tail emission beginning
   { 10, 261810, 0, 1660885200, 0 },
 };
 
