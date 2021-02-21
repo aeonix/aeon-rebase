@@ -6271,7 +6271,7 @@ uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm) const
       priority = 1;
   }
 
-  THROW_WALLET_EXCEPTION_IF(fee_algorithm < 0 || fee_algorithm > 2, error::invalid_priority);
+  THROW_WALLET_EXCEPTION_IF(fee_algorithm < 0 || fee_algorithm > 3, error::invalid_priority);
 
   // 1 to 3/4 are allowed as priorities
   const uint32_t max_priority = multipliers[fee_algorithm].count;
