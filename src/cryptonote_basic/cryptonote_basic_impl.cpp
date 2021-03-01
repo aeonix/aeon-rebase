@@ -96,7 +96,25 @@ namespace cryptonote {
     uint64_t base_reward = (MONEY_SUPPLY - already_generated_coins) >> emission_speed_factor;
     if (base_reward < FINAL_SUBSIDY_PER_MINUTE*target_minutes)
     {
-      base_reward = FINAL_SUBSIDY_PER_MINUTE*target_minutes;
+      base_reward = (MONEY_SUPPLY - already_generated_coins) >> (emission_speed_factor+4);
+      
+      uint64_t full_reward_zone = get_max_block_size();
+      
+      //make it soft
+      if (median_weight < full_reward_zone) {
+        median_weight = full_reward_zone;
+      }
+
+      if (current_block_weight <= median_weight) {
+        reward = base_reward;
+        return true;
+      }
+
+      if(current_block_weight > median_weight) {
+        MERROR("Block cumulative weight is too big: " << current_block_weight << ", expected less than " << median_weight);
+        return false;
+      }
+
     }
 
     uint64_t full_reward_zone = get_min_block_weight(version);

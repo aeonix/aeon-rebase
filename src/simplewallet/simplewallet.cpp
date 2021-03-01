@@ -114,7 +114,6 @@ enum TransferType {
 
 namespace
 {
-  const std::array<const char* const, 5> allowed_priority_strings = {{"default", "unimportant", "normal", "elevated", "priority"}};
   const auto arg_wallet_file = wallet_args::arg_wallet_file();
   const command_line::arg_descriptor<std::string> arg_generate_new_wallet = {"generate-new-wallet", sw::tr("Generate new wallet and save it to <arg>"), ""};
 #if 0
@@ -523,31 +522,6 @@ namespace
   }
 }
 
-bool parse_priority(const std::string& arg, uint32_t& priority)
-{
-  auto priority_pos = std::find(
-    allowed_priority_strings.begin(),
-    allowed_priority_strings.end(),
-    arg);
-  if(priority_pos != allowed_priority_strings.end()) {
-    priority = std::distance(allowed_priority_strings.begin(), priority_pos);
-    return true;
-  }
-  return false;
-}
-
-std::string join_priority_strings(const char *delimiter)
-{
-  std::string s;
-  for (size_t n = 0; n < allowed_priority_strings.size(); ++n)
-  {
-    if (!s.empty())
-      s += delimiter;
-    s += allowed_priority_strings[n];
-  }
-  return s;
-}
-
 std::string simple_wallet::get_commands_str()
 {
   std::stringstream ss;
@@ -791,6 +765,7 @@ bool simple_wallet::print_fee_info(const std::vector<std::string> &args/* = std:
   message_writer() << (boost::format(tr("Current fee is %s %s per kB")) % print_money(per_kb_fee) % cryptonote::get_unit(cryptonote::get_default_decimal_point())).str();
 
   std::vector<uint64_t> fees;
+ 
   for (uint32_t priority = 1; priority <= 4; ++priority)
   {
     uint64_t mult = m_wallet->get_fee_multiplier(priority);
@@ -1901,7 +1876,7 @@ bool simple_wallet::set_default_priority(const std::vector<std::string> &args/* 
   {
     if (strchr(args[1].c_str(), '-'))
     {
-      fail_msg_writer() << tr("priority must be either 0, 1, 2, 3, or 4, or one of: ") << join_priority_strings(", ");
+      fail_msg_writer() << tr("priority must be 1-50");
       return true;
     }
     if (args[1] == "0")
@@ -1910,23 +1885,11 @@ bool simple_wallet::set_default_priority(const std::vector<std::string> &args/* 
     }
     else
     {
-      bool found = false;
-      for (size_t n = 0; n < allowed_priority_strings.size(); ++n)
+      priority = boost::lexical_cast<int>(args[1]);
+      if (priority < 1 || priority > 50)
       {
-        if (allowed_priority_strings[n] == args[1])
-        {
-          found = true;
-          priority = n;
-        }
-      }
-      if (!found)
-      {
-        priority = boost::lexical_cast<int>(args[1]);
-        if (priority < 1 || priority > 4)
-        {
-          fail_msg_writer() << tr("priority must be either 0, 1, 2, 3, or 4, or one of: ") << join_priority_strings(", ");
-          return true;
-        }
+        fail_msg_writer() << tr("priority must be 1-50");
+        return true;
       }
     }
  
@@ -1940,7 +1903,7 @@ bool simple_wallet::set_default_priority(const std::vector<std::string> &args/* 
   }
   catch(const boost::bad_lexical_cast &)
   {
-    fail_msg_writer() << tr("priority must be either 0, 1, 2, 3, or 4, or one of: ") << join_priority_strings(", ");
+    fail_msg_writer() << tr("priority must be 1-50");
     return true;
   }
   catch(...)
@@ -2347,15 +2310,15 @@ simple_wallet::simple_wallet()
                            tr("Show the blockchain height."));
   m_cmd_binder.set_handler("transfer", boost::bind(&simple_wallet::transfer, this, _1),
                            tr("transfer [index=<N1>[,<N2>,...]] [<priority>] [<ring_size>] (<URI> | <address> <amount>) [<payment_id>]"),
-                           tr("Transfer <amount> to <address>. If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: unimportant, normal, elevated, priority. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included)"));
+                           tr("Transfer <amount> to <address>. If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: 0-50. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included)"));
   m_cmd_binder.set_handler("locked_transfer",
                            boost::bind(&simple_wallet::locked_transfer, this, _1),
                            tr("locked_transfer [index=<N1>[,<N2>,...]] [<priority>] [<ring_size>] (<URI> | <addr> <amount>) <lockblocks> [<payment_id>]"),
-                           tr("Transfer <amount> to <address> and lock it for <lockblocks> (max. 1000000). If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: unimportant, normal, elevated, priority. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included)"));
+                           tr("Transfer <amount> to <address> and lock it for <lockblocks> (max. 1000000). If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: 0-50. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included)"));
   m_cmd_binder.set_handler("locked_sweep_all",
                            boost::bind(&simple_wallet::locked_sweep_all, this, _1),
                            tr("locked_sweep_all [index=<N1>[,<N2>,...]] [<priority>] [<ring_size>] <address> <lockblocks> [<payment_id>]"),
-                           tr("Send all unlocked balance to an address and lock it for <lockblocks> (max. 1000000). If the parameter \"index<N1>[,<N2>,...]\" is specified, the wallet sweeps outputs received by those address indices. <priority> is the priority of the sweep. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: unimportant, normal, elevated, priority. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability."));
+                           tr("Send all unlocked balance to an address and lock it for <lockblocks> (max. 1000000). If the parameter \"index<N1>[,<N2>,...]\" is specified, the wallet sweeps outputs received by those address indices. <priority> is the priority of the sweep. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: 0-50. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability."));
   m_cmd_binder.set_handler("sweep_unmixable",
                            boost::bind(&simple_wallet::sweep_unmixable, this, _1),
                            tr("Send all unmixable outputs to yourself with ring_size 1"));
@@ -2446,8 +2409,8 @@ simple_wallet::simple_wallet()
                                   "  Whether to automatically synchronize new blocks from the daemon.\n "
                                   "refresh-type <full|optimize-coinbase|no-coinbase|default>\n "
                                   "  Set the wallet's refresh behaviour.\n "
-                                  "priority [0|1|2|3|4]\n "
-                                  "  Set the fee to default/unimportant/normal/elevated/priority.\n "
+                                  "priority 0-50\n "
+                                  "  Set the fee to 0-50\n "
                                   "confirm-missing-payment-id <1|0>\n "
                                   "ask-password <0|1|2   (or never|action|decrypt)>\n "
                                   "unit <aeon|milliaeon|microaeon|nanoaeon|picoaeon>\n "
@@ -2671,10 +2634,7 @@ bool simple_wallet::set_variable(const std::vector<std::string> &args)
     std::string seed_language = m_wallet->get_seed_language();
     if (m_use_english_language_names)
       seed_language = crypto::ElectrumWords::get_english_name_for(seed_language);
-    std::string priority_string = "invalid";
     uint32_t priority = m_wallet->get_default_priority();
-    if (priority < allowed_priority_strings.size())
-      priority_string = allowed_priority_strings[priority];
     std::string ask_password_string = "invalid";
     switch (m_wallet->ask_password())
     {
@@ -2689,7 +2649,7 @@ bool simple_wallet::set_variable(const std::vector<std::string> &args)
     success_msg_writer() << "default-ring-size = " << m_wallet->default_ring_size();
     success_msg_writer() << "auto-refresh = " << m_wallet->auto_refresh();
     success_msg_writer() << "refresh-type = " << get_refresh_type_name(m_wallet->get_refresh_type());
-    success_msg_writer() << "priority = " << priority<< " (" << priority_string << ")";
+    success_msg_writer() << "priority = " << m_wallet->get_default_priority();
     success_msg_writer() << "confirm-missing-payment-id = " << m_wallet->confirm_missing_payment_id();
     success_msg_writer() << "ask-password = " << m_wallet->ask_password() << " (" << ask_password_string << ")";
     success_msg_writer() << "unit = " << cryptonote::get_unit(cryptonote::get_default_decimal_point());
@@ -2747,7 +2707,7 @@ bool simple_wallet::set_variable(const std::vector<std::string> &args)
     CHECK_SIMPLE_VARIABLE("default-ring-size", set_default_ring_size, tr("integer >= 0, must not be 2"));
     CHECK_SIMPLE_VARIABLE("auto-refresh", set_auto_refresh, tr("0 or 1"));
     CHECK_SIMPLE_VARIABLE("refresh-type", set_refresh_type, tr("full (slowest, no assumptions); optimize-coinbase (fast, assumes the whole coinbase is paid to a single address); no-coinbase (fastest, assumes we receive no coinbase transaction), default (same as optimize-coinbase)"));
-    CHECK_SIMPLE_VARIABLE("priority", set_default_priority, tr("0, 1, 2, 3, or 4, or one of ") << join_priority_strings(", "));
+    CHECK_SIMPLE_VARIABLE("priority", set_default_priority, tr("0-50") );
     CHECK_SIMPLE_VARIABLE("confirm-missing-payment-id", set_confirm_missing_payment_id, tr("0 or 1"));
     CHECK_SIMPLE_VARIABLE("ask-password", set_ask_password, tr("0|1|2 (or never|action|decrypt)"));
     CHECK_SIMPLE_VARIABLE("unit", set_unit, tr("aeon, milliaeon, microaeon, nanoaeon, picoaeon"));
@@ -4783,9 +4743,20 @@ bool simple_wallet::transfer_main(int transfer_type, const std::vector<std::stri
   }
 
   uint32_t priority = 0;
-  if (local_args.size() > 0 && parse_priority(local_args[0], priority))
-    local_args.erase(local_args.begin());
-
+  if(local_args.size() > 0) {
+    if(!epee::string_tools::get_xtype_from_string(priority, local_args[0]))
+    {
+    }
+    else if (priority >50 || priority < 0)
+    {
+      fail_msg_writer() << tr("priority must be 0-50");
+      return true;
+    }
+    else
+    {
+      local_args.erase(local_args.begin());
+    }
+  }
   size_t ring_size = DEFAULT_RING_SIZE;
   if(local_args.size() > 0) {
     if(!epee::string_tools::get_xtype_from_string(ring_size, local_args[0]))
@@ -5348,8 +5319,20 @@ bool simple_wallet::sweep_main(uint64_t below, bool locked, const std::vector<st
   }
 
   uint32_t priority = 0;
-  if (local_args.size() > 0 && parse_priority(local_args[0], priority))
-    local_args.erase(local_args.begin());
+  if(local_args.size() > 0) {
+    if(!epee::string_tools::get_xtype_from_string(priority, local_args[0]))
+    {
+    }
+    else if (priority >50 || priority < 0)
+    {
+      fail_msg_writer() << tr("priority must be 0-50");
+      return true;
+    }
+    else
+    {
+      local_args.erase(local_args.begin());
+    }
+  }
 
   size_t ring_size = DEFAULT_RING_SIZE;
   if(local_args.size() > 0) {
@@ -5604,9 +5587,20 @@ bool simple_wallet::sweep_single(const std::vector<std::string> &args_)
   std::vector<std::string> local_args = args_;
 
   uint32_t priority = 0;
-  if (local_args.size() > 0 && parse_priority(local_args[0], priority))
-    local_args.erase(local_args.begin());
-
+  if(local_args.size() > 0) {
+    if(!epee::string_tools::get_xtype_from_string(priority, local_args[0]))
+    {
+    }
+    else if (priority >50 || priority < 0)
+    {
+      fail_msg_writer() << tr("priority must be 0-50");
+      return true;
+    }
+    else
+    {
+      local_args.erase(local_args.begin());
+    }
+  }
   size_t ring_size = DEFAULT_RING_SIZE;
   if(local_args.size() > 0) {
     if(!epee::string_tools::get_xtype_from_string(ring_size, local_args[0]))

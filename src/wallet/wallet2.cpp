@@ -6197,19 +6197,70 @@ uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm) const
   static const struct
   {
     size_t count;
-    uint64_t multipliers[4];
+    uint64_t multipliers[50];
   }
   multipliers[] =
   {
     { 3, {1, 2, 3} },
     { 3, {1, 20, 166} },
     { 4, {1, 4, 20, 166} },
+    { 50, {
+	    1,
+	    2,
+	    3,
+	    4,
+	    6,
+	    8,
+	    11,
+	    16,
+	    23,
+	    32,
+	    45,
+	    64,
+	    91,
+	    128,
+	    181,
+	    256,
+	    362,
+	    512,
+	    724,
+	    1024,
+	    1448,
+	    2048,
+	    2896,
+	    4096,
+	    5793,
+	    8192,
+	    11585,
+	    16384,
+	    23170,
+	    32768,
+	    46341,
+	    65536,
+	    92682,
+	    131072,
+	    185364,
+	    262144,
+	    370728,
+	    524288,
+	    741455,
+	    1048576,
+	    1482910,
+	    2097152,
+	    2965821,
+	    4194304,
+	    5931642,
+	    8388608,
+	    11863283,
+	    16777216,
+	    23726566,
+	    33554432,
+    }},
   };
 
   if (fee_algorithm == -1)
     fee_algorithm = get_fee_algorithm();
-
-  // 0 -> default (here, x1 till fee algorithm 2, x4 from it)
+	
   if (priority == 0)
     priority = m_default_priority;
   if (priority == 0)
@@ -6220,7 +6271,7 @@ uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm) const
       priority = 1;
   }
 
-  THROW_WALLET_EXCEPTION_IF(fee_algorithm < 0 || fee_algorithm > 2, error::invalid_priority);
+  THROW_WALLET_EXCEPTION_IF(fee_algorithm < 0 || fee_algorithm > 3, error::invalid_priority);
 
   // 1 to 3/4 are allowed as priorities
   const uint32_t max_priority = multipliers[fee_algorithm].count;
@@ -6237,12 +6288,16 @@ uint64_t wallet2::get_per_kb_fee() const
 {
   if(m_light_wallet)
     return m_light_wallet_per_kb_fee;
+  if (use_fork_rules(10, 0))
+    return FEE_PER_KB_v10;
   return FEE_PER_KB;
 }
 //----------------------------------------------------------------------------------------------------
 int wallet2::get_fee_algorithm() const
 {
   // changes at v3 and v5
+  if (use_fork_rules(10, 0))
+    return 3;
   if (use_fork_rules(5, 0))
     return 2;
   if (use_fork_rules(3, -720 * 14))

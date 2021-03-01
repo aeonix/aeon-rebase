@@ -41,7 +41,7 @@
 #define HARDFORK_1_DIFFADJ_WINDOW                       360
 
 #define CRYPTONOTE_MAX_BLOCK_NUMBER                     500000000
-#define CRYPTONOTE_MAX_BLOCK_SIZE                       500000000  // block header blob limit, never used!
+#define CRYPTONOTE_MAX_BLOCK_SIZE                       1048576 
 #define CRYPTONOTE_GETBLOCKTEMPLATE_MAX_BLOCK_SIZE	196608 //size of block (bytes) that is the maximum that miners will produce
 #define CRYPTONOTE_MAX_TX_SIZE                          1000000000
 #define CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER          0
@@ -71,6 +71,7 @@
 #define DEFAULT_FEE_V1                                  ((uint64_t)10000000000) // pow(10, 10)
 
 #define FEE_PER_KB                                      ((uint64_t)1000000000) // 1 * pow(10, 9)
+#define FEE_PER_KB_v10                                      ((uint64_t)1024) // 1 atomic unit = 1 byte
 
 #define ORPHANED_BLOCKS_MAX_COUNT                       100
 
