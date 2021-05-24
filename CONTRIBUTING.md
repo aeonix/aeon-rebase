@@ -11,21 +11,48 @@ knowledge are encouraged to contribute in this effort. In order to ensure the co
 helps new developers easily navigate through the commit log and cross-reference between the two repositories) as well
 as to properly credit the original author, please use the `git cherry-pick` command.
 
-It is also highly recommended to postfix the first line of the commit message with the corresponding pull request
-number so that one can easily reference the original Monero PR. For example, if you are to merge the upstream PR 4356
+Also, in order to make it easy to reference the original Monero PR, please postfix the first line of the commit message
+with the corresponding pull request number in the form of `monero/#NNNN` (this lets GitHub automatically create a link
+to the Pull Request page). For example, if you are to merge the upstream [PR 4036](https://github.com/monero-project/monero/pull/4036)
 which has two commits with the following commit messages:
 
-    Docker android: use common prefix
-    Docker android: add libsodium
+commit 9f3963e:
+```
+Arbitrary M/N multisig schemes:
+
+* support in wallet2
+* support in monero-wallet-cli
+* support in monero-wallet-rpc
+* support in wallet api
+* support in monero-gen-trusted-multisig
+* unit tests for multisig wallets creation
+```
+
+commit 9acf42d:
+```
+Multisig M/N functionality core tests added 
+```
 
 then, make the corresponding commit messages as follows:
 
-    Docker android: use common prefix /monero#4356
-    Docker android: add libsodium /monero#4356
+```
+Arbitrary M/N multisig schemes: monero/#4036
+
+* support in wallet2
+* support in monero-wallet-cli
+* support in monero-wallet-rpc
+* support in wallet api
+* support in monero-gen-trusted-multisig
+* unit tests for multisig wallets creation
+```
+and
+```
+Multisig M/N functionality core tests added monero/#4036
+```
 
 Note that the postfix is added to the first line of each commit message. Also, please make some reasonable effort to
-keep the ordering of merging patches consistent with the original so that potential issues like merge conflicts etc.
-are prevented, although this is not a strict requirement.
+keep the ordering of merged patches consistent with the original so that the chance of merge conflicts in the future
+is reduced, although this is not a strict requirement.
 
 ## Proposing changes
 
