@@ -37,6 +37,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 #include "include_base_utils.h"
 using namespace epee;
 
@@ -3661,6 +3663,7 @@ bool wallet2::query_device(hw::device::device_type& device_type, const std::stri
   if (json.Parse(account_data.c_str()).HasParseError() || !json.IsObject())
     crypto::chacha8(keys_file_data.account_data.data(), keys_file_data.account_data.size(), key, keys_file_data.iv, &account_data[0]);
 
+  device_type = hw::device::device_type::SOFTWARE;
   // The contents should be JSON if the wallet follows the new format.
   if (json.Parse(account_data.c_str()).HasParseError())
   {
@@ -7079,6 +7082,8 @@ void wallet2::get_outs(std::vector<std::vector<tools::wallet2::get_outs_entry>> 
           LOG_PRINT_L1("Selecting real output: " << td.m_global_output_index << " for " << print_money(amount));
         }
 
+        std::unordered_map<const char*, std::set<uint64_t>> picks;
+
         // while we still need more mixins
         uint64_t num_usable_outs = num_outs;
         bool allow_blackballed = false;
@@ -7174,10 +7179,14 @@ void wallet2::get_outs(std::vector<std::vector<tools::wallet2::get_outs_entry>> 
           }
           seen_indices.emplace(i);
 
-          LOG_PRINT_L2("picking " << i << " as " << type);
+          picks[type].insert(i);
           req.outputs.push_back({amount, i});
           ++num_found;
         }
+
+        for (const auto &pick: picks)
+          MDEBUG("picking " << pick.first << " outputs: " <<
+              boost::join(pick.second | boost::adaptors::transformed([](uint64_t out){return std::to_string(out);}), " "));
 
         // if we had enough unusable outputs, we might fall off here and still
         // have too few outputs, so we stuff with one to keep counts good, and
@@ -7194,8 +7203,15 @@ void wallet2::get_outs(std::vector<std::vector<tools::wallet2::get_outs_entry>> 
           [](const get_outputs_out &a, const get_outputs_out &b) { return a.index < b.index; });
     }
 
-    for (auto i: req.outputs)
-      LOG_PRINT_L1("asking for output " << i.index << " for " << print_money(i.amount));
+    if (ELPP->vRegistry()->allowed(el::Level::Debug, MONERO_DEFAULT_LOG_CATEGORY))
+    {
+      std::map<uint64_t, std::set<uint64_t>> outs;
+      for (const auto &i: req.outputs)
+        outs[i.amount].insert(i.index);
+      for (const auto &o: outs)
+        MDEBUG("asking for outputs with amount " << print_money(o.first) << ": " <<
+            boost::join(o.second | boost::adaptors::transformed([](uint64_t out){return std::to_string(out);}), " "));
+    }
 
     // get the keys for those
     m_daemon_rpc_mutex.lock();
