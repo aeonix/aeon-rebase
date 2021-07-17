@@ -36,6 +36,8 @@
 #include "portable_storage_from_json.h"
 #include "portable_storage_val_converters.h"
 
+#include <boost/mpl/contains.hpp>
+
 namespace epee
 {
   namespace serialization
